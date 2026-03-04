@@ -11,7 +11,9 @@ export class Ground {
       color: '#34ebae',
     });
     this.groundMesh = new Mesh(this.geometry, this.material);
+    this.groundMesh.name = "ground";
     this.groundMesh.rotation.x = -Math.PI / 2;
     scene.add(this.groundMesh);
   }
 }
+  

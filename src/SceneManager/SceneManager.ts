@@ -1,6 +1,14 @@
-import { PerspectiveCamera, Scene, WebGLRenderer } from "three";
+import {
+  PerspectiveCamera,
+  Raycaster,
+  Scene,
+  Vector2,
+  WebGLRenderer,
+} from "three";
 import { Ground } from "./Ground";
 import { Lights } from "./Lights";
+import { PlacementManager } from "../PlacementManager";
+import { spawnObject } from "../functions";
 
 export class SceneManager {
   private scene: Scene;
@@ -10,6 +18,9 @@ export class SceneManager {
 
   private ground = new Ground();
   private lights = new Lights();
+
+  private raycaster = new Raycaster();
+  private mouse = new Vector2();
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -23,6 +34,7 @@ export class SceneManager {
     this.camera.position.set(5, 8, 8);
     this.camera.lookAt(0, 0, 0);
     this.renderer = new WebGLRenderer({ antialias: true });
+    this.renderer.domElement.addEventListener("click", this.sceneClick);
     this.renderer.setClearColor("#87ceeb");
     this.container.appendChild(this.renderer.domElement);
 
@@ -32,6 +44,23 @@ export class SceneManager {
     window.addEventListener("resize", this.resize);
     this.animate();
   }
+
+  private sceneClick = (event: MouseEvent) => {
+    const rect = this.renderer.domElement.getBoundingClientRect();
+
+    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+
+    const intersects = this.raycaster.intersectObjects(this.scene.children);
+    const groundHit = intersects.find((i) => i.object.name === "ground");
+
+    if (groundHit && PlacementManager.selected) {
+      const point = intersects[0].point;
+      spawnObject(this.scene, Math.round(point.x), Math.round(point.z));
+    }
+  };
 
   private resize = () => {
     const width = this.container.clientWidth;
