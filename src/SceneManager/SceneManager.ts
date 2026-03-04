@@ -29,12 +29,18 @@ export class SceneManager {
     this.lights.createLights(this.scene);
     this.ground.createGround(this.scene);
     this.resize();
+    window.addEventListener("resize", this.resize);
     this.animate();
   }
 
   private resize = () => {
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.camera.aspect = window.innerWidth / window.innerHeight;
+    const width = this.container.clientWidth;
+    const height = this.container.clientHeight;
+
+    this.renderer.setSize(width, height);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
   };
 

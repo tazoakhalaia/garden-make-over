@@ -1,8 +1,10 @@
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  touch-action: none;
-  background: #87ceeb;
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
 }
