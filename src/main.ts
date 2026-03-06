@@ -4,10 +4,10 @@ import { PlacementManager } from "./PlacementManager";
 
 class App {
   private sceneManager: SceneManager;
+  private container = document.getElementById("app")!;
 
   constructor() {
-    const container = document.getElementById("app")!;
-    this.sceneManager = new SceneManager(container);
+    this.sceneManager = new SceneManager(this.container);
     this.addEvent();
   }
 
