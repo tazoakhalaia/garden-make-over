@@ -10,6 +10,7 @@ import { Ground } from "./Ground";
 import { Lights } from "./Lights";
 import { PlacementManager } from "../PlacementManager";
 import { spawnObject } from "../functions";
+import { OrbitControls } from "three/examples/jsm/Addons.js";
 
 export class SceneManager {
   private scene: Scene;
@@ -26,6 +27,8 @@ export class SceneManager {
   private raycaster = new Raycaster();
   private mouse = new Vector2();
 
+  private orbitControls?: OrbitControls;
+
   constructor(container: HTMLElement) {
     this.container = container;
 
@@ -36,7 +39,7 @@ export class SceneManager {
       0.1,
       1000,
     );
-    this.camera.position.set(5, 8, 8);
+    this.camera.position.set(0, 25, 15);
     this.camera.lookAt(0, 0, 0);
 
     this.renderer = new WebGLRenderer({ antialias: true });
@@ -48,6 +51,7 @@ export class SceneManager {
 
     this.pixiApp = new PIXI.Application();
     this.initPixi();
+    // this.orbitController();
 
     this.lights.createLights(this.scene);
     this.ground.createGround(this.scene);
@@ -72,6 +76,18 @@ export class SceneManager {
     this.pixiApp.stage.addChild(this.pixiContainer);
   }
 
+  orbitController() {
+    this.orbitControls = new OrbitControls(
+      this.camera,
+      this.renderer.domElement,
+    );
+    this.orbitControls.enableZoom = true;
+    this.orbitControls.maxPolarAngle = Math.PI / 2;
+    this.orbitControls.minPolarAngle = 0;
+    this.orbitControls.minZoom = 0;
+    this.orbitControls.maxZoom = 50;
+  }
+
   private sceneClick = (event: MouseEvent) => {
     const rect = this.renderer.domElement.getBoundingClientRect();
 
@@ -80,12 +96,20 @@ export class SceneManager {
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
 
-    const intersects = this.raycaster.intersectObjects(this.scene.children);
+    const intersects = this.raycaster.intersectObjects(
+      this.scene.children,
+      true,
+    );
     const groundHit = intersects.find((i) => i.object.name === "ground");
 
     if (groundHit && PlacementManager.selected) {
       const point = groundHit.point;
-      spawnObject(this.scene, Math.round(point.x), Math.round(point.z));
+      spawnObject(
+        this.scene,
+        Math.round(point.x),
+        point.y,
+        Math.round(point.z),
+      );
     }
   };
 
