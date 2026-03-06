@@ -1,3 +1,4 @@
+import * as PIXI from "pixi.js";
 import {
   PerspectiveCamera,
   Raycaster,
@@ -14,16 +15,20 @@ export class SceneManager {
   private scene: Scene;
   private renderer: WebGLRenderer;
   private camera: PerspectiveCamera;
+
   private container: HTMLElement;
+
+  private pixiApp: PIXI.Application;
+  private pixiContainer = new PIXI.Container();
 
   private ground = new Ground();
   private lights = new Lights();
-
   private raycaster = new Raycaster();
   private mouse = new Vector2();
 
   constructor(container: HTMLElement) {
     this.container = container;
+
     this.scene = new Scene();
     this.camera = new PerspectiveCamera(
       75,
@@ -33,15 +38,38 @@ export class SceneManager {
     );
     this.camera.position.set(5, 8, 8);
     this.camera.lookAt(0, 0, 0);
+
     this.renderer = new WebGLRenderer({ antialias: true });
-    this.renderer.domElement.addEventListener("click", this.sceneClick);
     this.renderer.setClearColor("#87ceeb");
     this.renderer.setSize(window.innerWidth, window.innerHeight);
+
     this.container.appendChild(this.renderer.domElement);
+    this.renderer.domElement.addEventListener("click", this.sceneClick);
+
+    this.pixiApp = new PIXI.Application();
+    this.initPixi();
 
     this.lights.createLights(this.scene);
     this.ground.createGround(this.scene);
     this.animate();
+  }
+
+  private async initPixi() {
+    await this.pixiApp.init({
+      width: window.innerWidth,
+      height: window.innerHeight,
+      backgroundAlpha: 0,
+    });
+
+    const pixiCanvas = this.pixiApp.canvas;
+
+    pixiCanvas.style.position = "absolute";
+    pixiCanvas.style.top = "0";
+    pixiCanvas.style.left = "0";
+    pixiCanvas.style.pointerEvents = "none";
+
+    this.container.appendChild(pixiCanvas);
+    this.pixiApp.stage.addChild(this.pixiContainer);
   }
 
   private sceneClick = (event: MouseEvent) => {
@@ -56,7 +84,7 @@ export class SceneManager {
     const groundHit = intersects.find((i) => i.object.name === "ground");
 
     if (groundHit && PlacementManager.selected) {
-      const point = intersects[0].point;
+      const point = groundHit.point;
       spawnObject(this.scene, Math.round(point.x), Math.round(point.z));
     }
   };
