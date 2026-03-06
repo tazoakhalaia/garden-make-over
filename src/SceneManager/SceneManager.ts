@@ -36,12 +36,11 @@ export class SceneManager {
     this.renderer = new WebGLRenderer({ antialias: true });
     this.renderer.domElement.addEventListener("click", this.sceneClick);
     this.renderer.setClearColor("#87ceeb");
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.container.appendChild(this.renderer.domElement);
 
     this.lights.createLights(this.scene);
     this.ground.createGround(this.scene);
-    this.resize();
-    window.addEventListener("resize", this.resize);
     this.animate();
   }
 
@@ -60,17 +59,6 @@ export class SceneManager {
       const point = intersects[0].point;
       spawnObject(this.scene, Math.round(point.x), Math.round(point.z));
     }
-  };
-
-  private resize = () => {
-    const width = this.container.clientWidth;
-    const height = this.container.clientHeight;
-
-    this.renderer.setSize(width, height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-    this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix();
   };
 
   private animate = () => {
