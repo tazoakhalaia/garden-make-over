@@ -25,10 +25,7 @@ export class PlantManager {
     if (this.occupiedPositions.has(key)) return;
     this.occupiedPositions.add(key);
 
-    const isAnimal = ["chicken", "sheep", "cow"].includes(cropName);
-    const stages = isAnimal
-      ? [`${cropName}_1`]
-      : [`${cropName}_1`, `${cropName}_2`, `${cropName}_3`];
+    const stages = [`${cropName}_1`, `${cropName}_2`, `${cropName}_3`];
 
     stages.forEach((stageName, i) => {
       setTimeout(() => {
