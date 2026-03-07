@@ -45,7 +45,7 @@ export class SceneManager {
       0.1,
       1000,
     );
-    this.camera.position.set(0, 25, 15);
+    this.camera.position.set(0, 30, 20);
     this.camera.lookAt(0, 0, 0);
     this.renderer = new WebGLRenderer({
       antialias: true,
@@ -62,8 +62,10 @@ export class SceneManager {
   private setupOrbitControls() {
     this.orbitControl = new OrbitControls(this.camera, this.pixiCanvas);
     this.orbitControl.enableZoom = true;
+    this.orbitControl.enableRotate = false;
+    this.orbitControl.enablePan = false;
     this.orbitControl.minDistance = 10;
-    this.orbitControl.maxDistance = 100;
+    this.orbitControl.maxDistance = 25;
   }
 
   async init() {
