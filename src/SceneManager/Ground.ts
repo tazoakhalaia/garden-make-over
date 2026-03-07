@@ -14,8 +14,10 @@ export class Ground {
         ground.position.set(0, -5, 0);
         ground.traverse((child: any) => {
           if (child.isMesh) {
+            child.name = "main_ground";
             child.castShadow = true;
             child.receiveShadow = true;
+            this.meshes.push(child);
           }
         });
         scene.add(ground);
