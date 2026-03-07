@@ -34,6 +34,8 @@ export class SceneManager {
   private pendingPosition: Vector3 | null = null;
   private pendingHit: any | null = null;
   private isDay = true;
+  private isSelectorOpen = false;
+  private selectorJustClosed = false;
 
   constructor(container: HTMLCanvasElement, pixiCanvas: HTMLCanvasElement) {
     this.threeCanvas = container;
@@ -94,41 +96,50 @@ export class SceneManager {
       }
     });
 
-    this.cropSelector = new CropSelector((crop) => {
-      if (!this.pendingPosition) return;
+    this.cropSelector = new CropSelector(
+      (crop) => {
+        this.isSelectorOpen = false;
+        this.selectorJustClosed = true;
 
-      const config = CROP_CONFIG[crop];
-      if (!this.coinUI.spend(config.price)) return;
+        if (!this.pendingPosition) return;
 
-      if (crop === "ground") {
-        if (this.pendingHit?.name === "placeholder") {
-          this.placeHolder.removePlaceholder(this.scene, this.pendingHit);
+        const config = CROP_CONFIG[crop];
+        if (!this.coinUI.spend(config.price)) return;
+
+        if (crop === "ground") {
+          if (this.pendingHit?.name === "placeholder") {
+            this.placeHolder.removePlaceholder(this.scene, this.pendingHit);
+          }
+          spawnObject(
+            this.scene,
+            this.pendingPosition.x,
+            0,
+            this.pendingPosition.z,
+            "ground",
+          );
+        } else {
+          this.plantManager.plant(
+            this.scene,
+            new Vector3(this.pendingPosition.x, 0, this.pendingPosition.z),
+            crop,
+            this.stage,
+            this.camera,
+            this.threeCanvas,
+            this.coinUI,
+            config.reward,
+          );
         }
-        spawnObject(
-          this.scene,
-          this.pendingPosition.x,
-          0,
-          this.pendingPosition.z,
-          "ground",
-        );
-      } else {
-        this.plantManager.plant(
-          this.scene,
-          new Vector3(this.pendingPosition.x, 0, this.pendingPosition.z),
-          crop,
-          this.stage,
-          this.camera,
-          this.threeCanvas,
-          this.coinUI,
-          config.reward,
-        );
-      }
 
-      this.pendingPosition = null;
-      this.pendingHit = null;
-    });
+        this.pendingPosition = null;
+        this.pendingHit = null;
+      },
+      () => {
+        this.isSelectorOpen = false;
+        this.selectorJustClosed = true;
+      },
+    );
 
-    this.pixiCanvas.addEventListener("click", (e) => this.handleClick(e));
+    this.pixiCanvas.addEventListener("pointerdown", (e) => this.handleClick(e));
     this.render();
   }
 
@@ -140,6 +151,11 @@ export class SceneManager {
   private handleClick(e: PointerEvent) {
     const { clientX: x, clientY: y } = e;
     if (this.isPixiObjectAt(x, y)) return;
+    if (this.isSelectorOpen) return;
+    if (this.selectorJustClosed) {
+      this.selectorJustClosed = false;
+      return;
+    }
 
     const result = this.raycast.clickWithPriority(
       x,
@@ -158,13 +174,14 @@ export class SceneManager {
       hit.getWorldPosition(placeholderPos);
       this.pendingPosition = new Vector3(placeholderPos.x, 0, placeholderPos.z);
       this.pendingHit = hit;
+      this.isSelectorOpen = true;
       this.cropSelector.show(this.stage, x, y, this.coinUI.total, ["ground"]);
     } else if (hit.name.startsWith("ground")) {
       const groundCenter = new Vector3();
       hit.getWorldPosition(groundCenter);
-
       this.pendingPosition = new Vector3(groundCenter.x, 0, groundCenter.z);
       this.pendingHit = hit;
+      this.isSelectorOpen = true;
       this.cropSelector.show(this.stage, x, y, this.coinUI.total, ["plant"]);
     }
   }

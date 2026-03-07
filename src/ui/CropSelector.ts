@@ -19,9 +19,11 @@ export const CROP_CONFIG: Record<
 export class CropSelector {
   private container = new Container();
   private onSelect: (crop: string) => void;
+  private onClose?: () => void;
 
-  constructor(onSelect: (crop: string) => void) {
+  constructor(onSelect: (crop: string) => void, onClose?: () => void) {
     this.onSelect = onSelect;
+    this.onClose = onClose;
   }
 
   show(
@@ -42,7 +44,6 @@ export class CropSelector {
     overlay.eventMode = "static";
     overlay.addEventListener("pointerdown", (e) => {
       e.stopPropagation();
-      this.hide();
     });
     this.container.addChild(overlay);
 
@@ -78,7 +79,7 @@ export class CropSelector {
         .roundRect(0, 0, panelW - 20, 48, 10)
         .fill({ color: canAfford ? 0x4caf50 : 0x555555 });
 
-      btn.position.set(panelX + 10, panelY + 14 + i * 58);
+      btn.position.set(panelX + 10, panelY + 44 + i * 58);
       btn.eventMode = canAfford ? "dynamic" : "none";
       btn.cursor = canAfford ? "pointer" : "default";
       btn.alpha = canAfford ? 1 : 0.5;
@@ -125,5 +126,6 @@ export class CropSelector {
   hide() {
     this.container.removeChildren();
     this.container.parent?.removeChild(this.container);
+    this.onClose?.();
   }
 }
