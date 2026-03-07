@@ -1,6 +1,6 @@
 import { Container } from "pixi.js";
 import { Camera, Scene, Vector3 } from "three";
-import { spawnObject } from "../functions";
+import { spawnPlant } from "../functions";
 import type { CoinUI } from "../ui/CoinUi";
 import { FloatingCoin } from "../ui/FloatingCoin";
 
@@ -30,7 +30,7 @@ export class PlantManager {
     stages.forEach((stageName, i) => {
       setTimeout(() => {
         if (i > 0) this.removeByPosition(scene, position, stages[i - 1]);
-        spawnObject(scene, position.x, position.y, position.z, stageName);
+        spawnPlant(scene, position.x, position.y, position.z, stageName);
 
         if (i === stages.length - 1) {
           const coin = new FloatingCoin();

@@ -9,7 +9,7 @@ import {
   WebGLRenderer,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
-import { spawnObject } from "../functions";
+import { spawnAnimal, spawnPlant } from "../functions";
 import { PlantManager, RaycastManager } from "../Manager";
 import { DayNightToggle } from "../Manager/DayNightTogglerManager";
 import { LightsManager } from "../Manager/LightManger";
@@ -132,12 +132,11 @@ export class SceneManager {
         if (this.pendingPosition) {
           const offsetX = (Math.random() - 0.5) * 4;
           const offsetZ = (Math.random() - 0.5) * 4;
-          spawnObject(
+          spawnAnimal(
             this.scene,
             this.pendingPosition.x + offsetX,
-            0,
             this.pendingPosition.z + offsetZ,
-            `${crop}_1`,
+            crop,
           );
         }
       },
@@ -162,7 +161,7 @@ export class SceneManager {
           if (this.pendingHit?.name === "placeholder") {
             this.placeHolder.removePlaceholder(this.scene, this.pendingHit);
           }
-          spawnObject(
+          spawnPlant(
             this.scene,
             this.pendingPosition.x,
             0,
