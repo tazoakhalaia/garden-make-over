@@ -1,3 +1,4 @@
+import gsap from "gsap";
 import { Application, Container } from "pixi.js";
 import {
   Mesh,
@@ -10,7 +11,7 @@ import {
 } from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { spawnAnimal, spawnPlant } from "../functions";
-import { PlantManager, RaycastManager } from "../Manager";
+import { PlantManager, RaycastManager, Tutorial } from "../Manager";
 import { DayNightToggle } from "../Manager/DayNightTogglerManager";
 import { LightsManager } from "../Manager/LightManger";
 import { PlaceHolder } from "../Manager/Placeholder";
@@ -19,6 +20,11 @@ import { CROP_CONFIG, CropSelector } from "../ui/CropSelector";
 import { Ground } from "./Ground";
 
 const ANIMAL_CROPS = ["chicken", "sheep", "cow"];
+const STEP_CLICK_PLACEHOLDER = 0;
+const STEP_CLICK_CORN = 1;
+
+const DEFAULT_CAM = { x: 0, y: 22, z: 15 };
+const DEFAULT_LOOKAT = { x: 0, y: 0, z: 0 };
 
 export class SceneManager {
   private scene: Scene;
@@ -38,6 +44,7 @@ export class SceneManager {
   private coinUI = new CoinUI();
   private dayNightToggle = new DayNightToggle();
   private ligthsManger = new LightsManager();
+  private tutorial = new Tutorial();
 
   private threeCanvas: HTMLCanvasElement;
   private pixiCanvas: HTMLCanvasElement;
@@ -49,6 +56,14 @@ export class SceneManager {
   private selectorJustClosed = false;
   private isAnimalSelectorOpen = false;
   private animalSelectorJustClosed = false;
+  private tutorialStep = STEP_CLICK_PLACEHOLDER;
+  private tutorialActive = true;
+
+  private lookAt = new Vector3(
+    DEFAULT_LOOKAT.x,
+    DEFAULT_LOOKAT.y,
+    DEFAULT_LOOKAT.z,
+  );
 
   constructor(container: HTMLCanvasElement, pixiCanvas: HTMLCanvasElement) {
     this.threeCanvas = container;
@@ -60,8 +75,8 @@ export class SceneManager {
       0.1,
       1000,
     );
-    this.camera.position.set(0, 30, 20);
-    this.camera.lookAt(0, 0, 0);
+    this.camera.position.set(DEFAULT_CAM.x, DEFAULT_CAM.y, DEFAULT_CAM.z);
+    this.camera.lookAt(DEFAULT_LOOKAT.x, DEFAULT_LOOKAT.y, DEFAULT_LOOKAT.z);
     this.renderer = new WebGLRenderer({
       antialias: true,
       canvas: this.threeCanvas,
@@ -75,13 +90,14 @@ export class SceneManager {
   }
 
   private spawnFenceTrigger(x: number, z: number) {
-    const geometry = new PlaneGeometry(14, 14);
-    const material = new MeshBasicMaterial({
-      transparent: true,
-      opacity: 0,
-      depthWrite: false,
-    });
-    const plane = new Mesh(geometry, material);
+    const plane = new Mesh(
+      new PlaneGeometry(14, 14),
+      new MeshBasicMaterial({
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+      }),
+    );
     plane.name = "fence_trigger";
     plane.rotation.x = -Math.PI / 2;
     plane.position.set(x, 0.1, z);
@@ -94,7 +110,124 @@ export class SceneManager {
     this.orbitControl.enableRotate = false;
     this.orbitControl.enablePan = false;
     this.orbitControl.minDistance = 10;
-    this.orbitControl.maxDistance = 25;
+    this.orbitControl.maxDistance = 30;
+  }
+
+  private zoomTo(worldPos: Vector3) {
+    if (this.orbitControl) this.orbitControl.enabled = false;
+
+    gsap.killTweensOf(this.camera.position);
+    gsap.killTweensOf(this.lookAt);
+
+    gsap.to(this.camera.position, {
+      x: worldPos.x,
+      y: 12,
+      z: worldPos.z + 8,
+      duration: 0.6,
+      ease: "power2.inOut",
+    });
+
+    gsap.to(this.lookAt, {
+      x: worldPos.x,
+      y: 0,
+      z: worldPos.z,
+      duration: 0.6,
+      ease: "power2.inOut",
+      onUpdate: () => {
+        if (this.orbitControl) {
+          this.orbitControl.target.set(
+            this.lookAt.x,
+            this.lookAt.y,
+            this.lookAt.z,
+          );
+        }
+      },
+    });
+  }
+
+  private zoomOut() {
+    gsap.killTweensOf(this.camera.position);
+    gsap.killTweensOf(this.lookAt);
+
+    gsap.to(this.camera.position, {
+      x: DEFAULT_CAM.x,
+      y: DEFAULT_CAM.y,
+      z: DEFAULT_CAM.z,
+      duration: 0.6,
+      ease: "power2.inOut",
+      onComplete: () => {
+        if (this.orbitControl) this.orbitControl.enabled = true;
+      },
+    });
+
+    gsap.to(this.lookAt, {
+      x: DEFAULT_LOOKAT.x,
+      y: DEFAULT_LOOKAT.y,
+      z: DEFAULT_LOOKAT.z,
+      duration: 0.6,
+      ease: "power2.inOut",
+      onUpdate: () => {
+        if (this.orbitControl) {
+          this.orbitControl.target.set(
+            this.lookAt.x,
+            this.lookAt.y,
+            this.lookAt.z,
+          );
+        }
+      },
+    });
+  }
+
+  private toScreen(worldPos: Vector3): { x: number; y: number } {
+    const vec = worldPos.clone().project(this.camera);
+    return {
+      x: ((vec.x + 1) / 2) * window.innerWidth,
+      y: ((-vec.y + 1) / 2) * window.innerHeight,
+    };
+  }
+
+  private startTutorial() {
+    const firstPlaceholder = this.scene.children.find(
+      (c) => c.name === "placeholder",
+    );
+    if (!firstPlaceholder) return;
+
+    const worldPos = new Vector3();
+    firstPlaceholder.getWorldPosition(worldPos);
+    const screen = this.toScreen(worldPos);
+
+    this.tutorial.start(
+      this.stage,
+      [
+        {
+          message: "👋 Tap the placeholder to open the market!",
+          targetX: screen.x,
+          targetY: screen.y,
+        },
+      ],
+      () => {
+        this.tutorialActive = false;
+      },
+    );
+  }
+
+  private advanceTutorialToCorn() {
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    this.tutorial.start(
+      this.stage,
+      [
+        {
+          message: "🌽 Now tap Corn to plant your first crop!",
+          targetX: W / 2,
+          targetY: H / 2 + 44,
+        },
+      ],
+      () => {
+        this.tutorialActive = false;
+      },
+    );
+    this.tutorialStep = STEP_CLICK_CORN;
   }
 
   async init() {
@@ -128,22 +261,22 @@ export class SceneManager {
         if (!ANIMAL_CROPS.includes(crop)) return;
         const config = CROP_CONFIG[crop];
         if (!this.coinUI.spend(config.price)) return;
+        if (!this.pendingPosition) return;
 
-        if (this.pendingPosition) {
-          const offsetX = (Math.random() - 0.5) * 4;
-          const offsetZ = (Math.random() - 0.5) * 4;
-          spawnAnimal(
-            this.scene,
-            this.pendingPosition.x + offsetX,
-            this.pendingPosition.z + offsetZ,
-            crop,
-          );
-        }
+        const offsetX = (Math.random() - 0.5) * 4;
+        const offsetZ = (Math.random() - 0.5) * 4;
+        spawnAnimal(
+          this.scene,
+          this.pendingPosition.x + offsetX,
+          this.pendingPosition.z + offsetZ,
+          crop,
+        );
       },
       () => {
         this.isAnimalSelectorOpen = false;
         this.animalSelectorJustClosed = true;
         this.pendingPosition = null;
+        this.zoomOut();
       },
     );
 
@@ -151,6 +284,12 @@ export class SceneManager {
       (crop) => {
         this.isSelectorOpen = false;
         this.selectorJustClosed = true;
+        this.zoomOut();
+
+        if (this.tutorialActive && this.tutorialStep === STEP_CLICK_CORN) {
+          this.tutorial.end();
+          this.tutorialActive = false;
+        }
 
         if (!this.pendingPosition) return;
 
@@ -193,10 +332,12 @@ export class SceneManager {
       () => {
         this.isSelectorOpen = false;
         this.selectorJustClosed = true;
+        this.zoomOut();
       },
     );
 
     this.pixiCanvas.addEventListener("pointerdown", (e) => this.handleClick(e));
+    setTimeout(() => this.startTutorial(), 500);
     this.render();
   }
 
@@ -208,8 +349,7 @@ export class SceneManager {
   private handleClick(e: PointerEvent) {
     const { clientX: x, clientY: y } = e;
     if (this.isPixiObjectAt(x, y)) return;
-    if (this.isSelectorOpen) return;
-    if (this.isAnimalSelectorOpen) return;
+    if (this.isSelectorOpen || this.isAnimalSelectorOpen) return;
     if (this.selectorJustClosed) {
       this.selectorJustClosed = false;
       return;
@@ -222,41 +362,49 @@ export class SceneManager {
     const result = this.raycast.clickWithPriority(
       x,
       y,
-      this.threeCanvas,
+      this.pixiCanvas,
       this.camera,
       this.scene.children,
       "placeholder",
     );
     if (!result) return;
 
-    const { object: hit, point } = result;
+    const { object: hit } = result;
 
     if (hit.name === "fence_trigger") {
-      const triggerCenter = new Vector3();
-      hit.getWorldPosition(triggerCenter);
-      this.pendingPosition = new Vector3(triggerCenter.x, 0, triggerCenter.z);
+      const center = new Vector3();
+      hit.getWorldPosition(center);
+      this.pendingPosition = new Vector3(center.x, 0, center.z);
       this.pendingHit = hit;
       this.isAnimalSelectorOpen = true;
+      this.zoomTo(center);
       this.animalSelector.show(this.stage, x, y, this.coinUI.total, ["animal"]);
     } else if (hit.name === "placeholder") {
-      const placeholderPos = new Vector3();
-      hit.getWorldPosition(placeholderPos);
-      this.pendingPosition = new Vector3(placeholderPos.x, 0, placeholderPos.z);
+      const pos = new Vector3();
+      hit.getWorldPosition(pos);
+      this.pendingPosition = new Vector3(pos.x, 0, pos.z);
       this.pendingHit = hit;
       this.isSelectorOpen = true;
+      this.zoomTo(pos);
       this.cropSelector.show(this.stage, x, y, this.coinUI.total, ["ground"]);
+
+      if (this.tutorialActive && this.tutorialStep === STEP_CLICK_PLACEHOLDER) {
+        setTimeout(() => this.advanceTutorialToCorn(), 150);
+      }
     } else if (hit.name.startsWith("ground")) {
-      const groundCenter = new Vector3();
-      hit.getWorldPosition(groundCenter);
-      this.pendingPosition = new Vector3(groundCenter.x, 0, groundCenter.z);
+      const pos = new Vector3();
+      hit.getWorldPosition(pos);
+      this.pendingPosition = new Vector3(pos.x, 0, pos.z);
       this.pendingHit = hit;
       this.isSelectorOpen = true;
+      this.zoomTo(pos);
       this.cropSelector.show(this.stage, x, y, this.coinUI.total, ["plant"]);
     }
   }
 
   private render = () => {
     requestAnimationFrame(this.render);
+    this.camera.lookAt(this.lookAt);
     this.renderer.render(this.scene, this.camera);
     this.orbitControl?.update();
     this.app?.renderer.render({ container: this.stage, clear: false });

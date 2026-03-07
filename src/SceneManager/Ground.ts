@@ -10,7 +10,7 @@ export class Ground {
       "/models/ground.glb",
       (gltf) => {
         const ground = gltf.scene;
-        ground.scale.set(1, 1, 1);
+        ground.scale.set(1.2, 1, 1);
         ground.position.set(0, -5, 0);
         ground.traverse((child: any) => {
           if (child.isMesh) {
