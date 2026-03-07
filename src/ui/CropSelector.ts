@@ -2,15 +2,26 @@ import { Container, Graphics, Text } from "pixi.js";
 
 export const CROP_CONFIG: Record<
   string,
-  { label: string; price: number; reward: number }
+  {
+    label: string;
+    price: number;
+    reward: number;
+    category: "plant" | "animal" | "ground";
+  }
 > = {
-  corn: { label: "🌽 Corn", price: 1, reward: 5 },
-  grape: { label: "🍇 Grape", price: 2, reward: 8 },
-  strawberry: { label: "🍓 Strawberry", price: 3, reward: 12 },
-  tomato: { label: "🍅 Tomato", price: 2, reward: 7 },
-  chicken: { label: "🐔 Chicken", price: 3, reward: 10 },
-  sheep: { label: "🐑 Sheep", price: 4, reward: 14 },
-  cow: { label: "🐄 Cow", price: 5, reward: 18 },
+  ground: { label: "🟫 Ground", price: 1, reward: 0, category: "ground" },
+  corn: { label: "🌽 Corn", price: 1, reward: 5, category: "plant" },
+  grape: { label: "🍇 Grape", price: 2, reward: 8, category: "plant" },
+  strawberry: {
+    label: "🍓 Strawberry",
+    price: 3,
+    reward: 12,
+    category: "plant",
+  },
+  tomato: { label: "🍅 Tomato", price: 2, reward: 7, category: "plant" },
+  chicken: { label: "🐔 Chicken", price: 3, reward: 10, category: "animal" },
+  sheep: { label: "🐑 Sheep", price: 4, reward: 14, category: "animal" },
+  cow: { label: "🐄 Cow", price: 5, reward: 18, category: "animal" },
 };
 
 export class CropSelector {
@@ -21,10 +32,20 @@ export class CropSelector {
     this.onSelect = onSelect;
   }
 
-  show(stage: Container, screenX: number, screenY: number, coins: number) {
+  show(
+    stage: Container,
+    screenX: number,
+    screenY: number,
+    coins: number,
+    categories: ("plant" | "animal" | "ground")[],
+  ) {
     this.hide();
 
-    Object.entries(CROP_CONFIG).forEach(([key, crop], i) => {
+    const filtered = Object.entries(CROP_CONFIG).filter(([, v]) =>
+      categories.includes(v.category),
+    );
+
+    filtered.forEach(([key, crop], i) => {
       const canAfford = coins >= crop.price;
 
       const btn = new Graphics()

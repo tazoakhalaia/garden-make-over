@@ -97,18 +97,28 @@ export class SceneManager {
       if (!this.pendingPosition) return;
 
       const config = CROP_CONFIG[crop];
-      if (!this.coinUI.spend(config.price)) {
-        return;
-      }
+      if (!this.coinUI.spend(config.price)) return;
 
       const isAnimal = ANIMALS.includes(crop);
-      if (isAnimal) {
+
+      if (crop === "ground") {
+        if (this.pendingHit?.name === "placeholder") {
+          this.placeHolder.removePlaceholder(this.scene, this.pendingHit);
+        }
+        spawnObject(
+          this.scene,
+          this.pendingPosition.x,
+          0,
+          this.pendingPosition.z,
+          "ground",
+        );
+      } else if (isAnimal) {
         if (this.pendingHit?.name === "placeholder") {
           this.placeHolder.removePlaceholder(this.scene, this.pendingHit);
         }
         this.plantManager.plant(
           this.scene,
-          this.pendingPosition,
+          new Vector3(this.pendingPosition.x, 0, this.pendingPosition.z),
           crop,
           this.stage,
           this.camera,
@@ -117,19 +127,9 @@ export class SceneManager {
           config.reward,
         );
       } else {
-        if (this.pendingHit?.name === "placeholder") {
-          this.placeHolder.removePlaceholder(this.scene, this.pendingHit);
-          spawnObject(
-            this.scene,
-            this.pendingPosition.x,
-            this.pendingPosition.y,
-            this.pendingPosition.z,
-            "ground",
-          );
-        }
         this.plantManager.plant(
           this.scene,
-          this.pendingPosition,
+          new Vector3(this.pendingPosition.x, 0, this.pendingPosition.z),
           crop,
           this.stage,
           this.camera,
@@ -169,12 +169,15 @@ export class SceneManager {
       const position = hit.getWorldPosition(new Vector3());
       this.pendingPosition = position;
       this.pendingHit = hit;
-
-      this.cropSelector.show(this.stage, x, y, this.coinUI.total);
+      this.cropSelector.show(this.stage, x, y, this.coinUI.total, [
+        "animal",
+        "ground",
+      ]);
     } else if (hit.name.startsWith("ground")) {
       const position = hit.getWorldPosition(new Vector3());
       this.pendingPosition = position;
-      this.cropSelector.show(this.stage, x, y, this.coinUI.total);
+      this.pendingHit = null;
+      this.cropSelector.show(this.stage, x, y, this.coinUI.total, ["plant"]);
     }
   }
 

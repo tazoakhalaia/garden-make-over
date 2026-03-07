@@ -45,7 +45,7 @@ export function spawnObject(
     return;
   }
   const object = loadedScene.children[index].clone();
-  object.position.set(x, y + 0.1, z);
+  object.position.set(x, y, z);
   object.scale.set(0, 0, 0);
   object.rotation.y = Math.PI / 2;
   object.traverse((child: any) => {
