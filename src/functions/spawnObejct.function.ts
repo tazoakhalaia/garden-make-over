@@ -44,7 +44,6 @@ export function spawnObject(
   if (index === -1) {
     return;
   }
-
   const object = loadedScene.children[index].clone();
   object.position.set(x, y + 0.1, z);
   object.scale.set(0, 0, 0);

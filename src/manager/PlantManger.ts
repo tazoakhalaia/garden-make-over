@@ -1,5 +1,9 @@
 import { Scene, Vector3 } from "three";
+import { Container } from "pixi.js";
+import { Camera } from "three";
 import { spawnObject } from "../functions";
+import { FloatingCoin } from "../ui/FloatingCoin";
+import type { CoinUI } from "../ui/CoinUi";
 
 export class PlantManager {
   private occupiedPositions = new Set<string>();
@@ -8,23 +12,37 @@ export class PlantManager {
     return `${Math.round(x)},${Math.round(z)}`;
   }
 
-  plant(scene: Scene, position: Vector3, cropName: string) {
+  plant(
+    scene: Scene,
+    position: Vector3,
+    cropName: string,
+    stage: Container,
+    camera: Camera,
+    canvas: HTMLCanvasElement,
+    coinUI: CoinUI,
+    reward: number,
+  ) {
     const key = this.positionKey(position.x, position.z);
     if (this.occupiedPositions.has(key)) return;
     this.occupiedPositions.add(key);
 
-    const stages = [`${cropName}_1`, `${cropName}_2`, `${cropName}_3`];
+    const isAnimal = ["chicken", "sheep", "cow"].includes(cropName);
+    const stages = isAnimal
+      ? [`${cropName}_1`]
+      : [`${cropName}_1`, `${cropName}_2`, `${cropName}_3`];
 
-    stages.forEach((stage, i) => {
+    stages.forEach((stageName, i) => {
       setTimeout(() => {
         if (i > 0) this.removeByPosition(scene, position, stages[i - 1]);
-        spawnObject(scene, position.x, position.y, position.z, stage);
+        spawnObject(scene, position.x, position.y, position.z, stageName);
 
         if (i === stages.length - 1) {
-          setTimeout(() => {
-            this.removeByPosition(scene, position, stage);
+          const coin = new FloatingCoin();
+          coin.spawn(stage, position, camera, canvas, () => {
+            this.removeByPosition(scene, position, stageName);
             this.occupiedPositions.delete(key);
-          }, 2000);
+            coinUI.add(reward);
+          });
         }
       }, i * 2000);
     });

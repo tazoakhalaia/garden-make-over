@@ -1,21 +1,19 @@
 import { Application, Container } from "pixi.js";
-import {
-  PerspectiveCamera,
-  Scene,
-  Vector3,
-  WebGLRenderer,
-} from "three";
+import { PerspectiveCamera, Scene, Vector3, WebGLRenderer } from "three";
 import { Ground } from "./Ground";
 import { Lights } from "./Lights";
-import { spawnObject } from "../functions";
 import { PlaceHolder } from "../manager/Placeholder";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { PlantManager, RaycastManager } from "../manager";
+import { CROP_CONFIG, CropSelector } from "../ui/CropSelector";
+import { spawnObject } from "../functions";
+import { CoinUI } from "../ui/CoinUi";
 
 export class SceneManager {
   private scene: Scene;
   private renderer: WebGLRenderer;
   private camera: PerspectiveCamera;
+
   private app?: Application;
   private stage!: Container;
   private orbitControl?: OrbitControls;
@@ -25,9 +23,14 @@ export class SceneManager {
   private placeHolder = new PlaceHolder();
   private plantManager = new PlantManager();
   private raycast = new RaycastManager();
+  private cropSelector!: CropSelector;
+  private coinUI = new CoinUI();
 
   private threeCanvas: HTMLCanvasElement;
   private pixiCanvas: HTMLCanvasElement;
+
+  private pendingPosition: Vector3 | null = null;
+  private pendingHit: any | null = null;
 
   constructor(container: HTMLCanvasElement, pixiCanvas: HTMLCanvasElement) {
     this.threeCanvas = container;
@@ -59,7 +62,6 @@ export class SceneManager {
     this.orbitControl.minDistance = 10;
     this.orbitControl.maxDistance = 100;
   }
-
   async init() {
     this.app = new Application();
     await this.app.init({
@@ -68,13 +70,68 @@ export class SceneManager {
       backgroundAlpha: 0,
       antialias: true,
     });
+
     this.stage = this.app.stage;
     this.stage.eventMode = "passive";
     this.stage.interactiveChildren = true;
+
+    this.coinUI.create(this.stage);
+
+    const ANIMALS = ["chicken", "sheep", "cow"];
+
+    this.cropSelector = new CropSelector((crop) => {
+      if (!this.pendingPosition) return;
+
+      const config = CROP_CONFIG[crop];
+      if (!this.coinUI.spend(config.price)) {
+        return;
+      }
+
+      const isAnimal = ANIMALS.includes(crop);
+      if (isAnimal) {
+        if (this.pendingHit?.name === "placeholder") {
+          this.placeHolder.removePlaceholder(this.scene, this.pendingHit);
+        }
+        this.plantManager.plant(
+          this.scene,
+          this.pendingPosition,
+          crop,
+          this.stage,
+          this.camera,
+          this.threeCanvas,
+          this.coinUI,
+          config.reward,
+        );
+      } else {
+        if (this.pendingHit?.name === "placeholder") {
+          this.placeHolder.removePlaceholder(this.scene, this.pendingHit);
+          spawnObject(
+            this.scene,
+            this.pendingPosition.x,
+            this.pendingPosition.y,
+            this.pendingPosition.z,
+            "sheep_1",
+          );
+        }
+        this.plantManager.plant(
+          this.scene,
+          this.pendingPosition,
+          crop,
+          this.stage,
+          this.camera,
+          this.threeCanvas,
+          this.coinUI,
+          config.reward,
+        );
+      }
+
+      this.pendingPosition = null;
+      this.pendingHit = null;
+    });
+
     this.pixiCanvas.addEventListener("click", (e) => this.handleClick(e));
     this.render();
   }
-
   private isPixiObjectAt(x: number, y: number): boolean {
     const hits = this.app!.renderer.events.rootBoundary.hitTest(x, y);
     return hits !== null && hits !== this.stage;
@@ -94,13 +151,16 @@ export class SceneManager {
     );
     if (!hit) return;
 
-    if (hit.name.startsWith("ground")) {
+    if (hit.name === "placeholder") {
       const position = hit.getWorldPosition(new Vector3());
-      this.plantManager.plant(this.scene, position, "corn");
-    } else if (hit.name === "placeholder") {
+      this.pendingPosition = position;
+      this.pendingHit = hit;
+
+      this.cropSelector.show(this.stage, x, y, this.coinUI.total);
+    } else if (hit.name.startsWith("ground")) {
       const position = hit.getWorldPosition(new Vector3());
-      this.placeHolder.removePlaceholder(this.scene, hit);
-      spawnObject(this.scene, position.x, position.y, position.z, "ground");
+      this.pendingPosition = position;
+      this.cropSelector.show(this.stage, x, y, this.coinUI.total);
     }
   }
 
