@@ -1,21 +1,17 @@
 import "./style.css";
 import { SceneManager } from "./SceneManager";
-import { PlacementManager } from "./PlacementManager";
 
 class App {
   private sceneManager: SceneManager;
-  private container = document.getElementById("app")!;
+  private threeCanvas = document.getElementById(
+    "three-canvas",
+  )! as HTMLCanvasElement;
+  private pixiCanvas = document.getElementById(
+    "pixi-canvas",
+  )! as HTMLCanvasElement;
 
   constructor() {
-    this.sceneManager = new SceneManager(this.container);
-    this.addEvent();
-  }
-
-  addEvent() {
-    const plantBtn = document.getElementById("plant")!;
-    plantBtn.addEventListener("click", () => {
-      PlacementManager.selectedType("plant");
-    });
+    this.sceneManager = new SceneManager(this.threeCanvas, this.pixiCanvas);
   }
 }
 const app = new App();

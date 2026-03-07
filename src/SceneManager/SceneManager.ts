@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js";
+import { Application, Container } from "pixi.js";
 import {
   PerspectiveCamera,
   Raycaster,
@@ -8,29 +8,24 @@ import {
 } from "three";
 import { Ground } from "./Ground";
 import { Lights } from "./Lights";
-import { PlacementManager } from "../PlacementManager";
-import { spawnObject } from "../functions";
-import { OrbitControls } from "three/examples/jsm/Addons.js";
 
 export class SceneManager {
   private scene: Scene;
   private renderer: WebGLRenderer;
   private camera: PerspectiveCamera;
 
-  private container: HTMLElement;
-
-  private pixiApp: PIXI.Application;
-  private pixiContainer = new PIXI.Container();
+  private app?: Application;
+  private stage!: Container;
 
   private ground = new Ground();
   private lights = new Lights();
-  private raycaster = new Raycaster();
-  private mouse = new Vector2();
 
-  private orbitControls?: OrbitControls;
+  private threeCanvas: HTMLCanvasElement;
+  private pixiCanvas: HTMLCanvasElement;
 
-  constructor(container: HTMLElement) {
-    this.container = container;
+  constructor(container: HTMLCanvasElement, pixiCanvas: HTMLCanvasElement) {
+    this.threeCanvas = container;
+    this.pixiCanvas = pixiCanvas;
 
     this.scene = new Scene();
     this.camera = new PerspectiveCamera(
@@ -42,79 +37,79 @@ export class SceneManager {
     this.camera.position.set(0, 25, 15);
     this.camera.lookAt(0, 0, 0);
 
-    this.renderer = new WebGLRenderer({ antialias: true });
-    this.renderer.setClearColor("#87ceeb");
+    this.renderer = new WebGLRenderer({
+      antialias: true,
+      canvas: this.threeCanvas,
+    });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-
-    this.container.appendChild(this.renderer.domElement);
-    this.renderer.domElement.addEventListener("click", this.sceneClick);
-
-    this.pixiApp = new PIXI.Application();
-    this.initPixi();
-    // this.orbitController();
-
     this.lights.createLights(this.scene);
     this.ground.createGround(this.scene);
-    this.animate();
+    this.init();
   }
 
-  private async initPixi() {
-    await this.pixiApp.init({
-      width: window.innerWidth,
-      height: window.innerHeight,
+  async init() {
+    this.app = new Application();
+
+    await this.app.init({
+      canvas: this.pixiCanvas,
+      resizeTo: window,
       backgroundAlpha: 0,
+      antialias: true,
     });
 
-    const pixiCanvas = this.pixiApp.canvas;
+    this.stage = this.app.stage;
+    this.stage.eventMode = "passive";
+    this.stage.interactiveChildren = true;
 
-    pixiCanvas.style.position = "absolute";
-    pixiCanvas.style.top = "0";
-    pixiCanvas.style.left = "0";
-    pixiCanvas.style.pointerEvents = "none";
+    this.pixiCanvas.addEventListener("pointerdown", (e) => {
+      this.handlePointerDown(e);
+    });
 
-    this.container.appendChild(pixiCanvas);
-    this.pixiApp.stage.addChild(this.pixiContainer);
+    this.render();
   }
 
-  orbitController() {
-    this.orbitControls = new OrbitControls(
-      this.camera,
-      this.renderer.domElement,
-    );
-    this.orbitControls.enableZoom = true;
-    this.orbitControls.maxPolarAngle = Math.PI / 2;
-    this.orbitControls.minPolarAngle = 0;
-    this.orbitControls.minZoom = 0;
-    this.orbitControls.maxZoom = 50;
+  private isPixiObjectAt(x: number, y: number): boolean {
+    const hits = this.app!.renderer.events.rootBoundary.hitTest(x, y);
+    return hits !== null && hits !== this.stage;
   }
 
-  private sceneClick = (event: MouseEvent) => {
-    const rect = this.renderer.domElement.getBoundingClientRect();
+  private handlePointerDown(e: PointerEvent) {
+    const x = e.clientX;
+    const y = e.clientY;
 
-    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-
-    const intersects = this.raycaster.intersectObjects(
-      this.scene.children,
-      true,
-    );
-    const groundHit = intersects.find((i) => i.object.name === "ground");
-
-    if (groundHit && PlacementManager.selected) {
-      const point = groundHit.point;
-      spawnObject(
-        this.scene,
-        Math.round(point.x),
-        point.y,
-        Math.round(point.z),
-      );
+    if (this.isPixiObjectAt(x, y)) {
+      return;
     }
-  };
 
-  private animate = () => {
-    requestAnimationFrame(this.animate);
+    this.raycastGround(x, y);
+  }
+
+  private raycastGround(clientX: number, clientY: number) {
+    if (this.ground.meshes.length === 0) return;
+
+    const rect = this.threeCanvas.getBoundingClientRect();
+    const mouse = new Vector2(
+      ((clientX - rect.left) / rect.width) * 2 - 1,
+      -((clientY - rect.top) / rect.height) * 2 + 1,
+    );
+
+    const raycaster = new Raycaster();
+    raycaster.setFromCamera(mouse, this.camera);
+
+    const intersects = raycaster.intersectObjects(this.ground.meshes);
+    if (intersects.length > 0) {
+      console.log("ground hit at", intersects[0].point);
+    }
+  }
+
+  private render = () => {
+    requestAnimationFrame(this.render);
     this.renderer.render(this.scene, this.camera);
+    if (this.app) {
+      this.app.renderer.render({
+        container: this.stage,
+        clear: false,
+      });
+    }
   };
 }

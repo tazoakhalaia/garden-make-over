@@ -1,21 +1,23 @@
-html,
-body {
+body,
+html {
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background-color: #222;
 }
 
-#app {
-  width: 100vw;
-  height: 100vh;
+#three-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
 }
 
-.decoration {
-  position: fixed;
-  bottom: 120px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-  z-index: 10;
+#pixi-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: auto;
 }
