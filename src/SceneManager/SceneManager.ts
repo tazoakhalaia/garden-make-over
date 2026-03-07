@@ -1,5 +1,13 @@
 import { Application, Container } from "pixi.js";
-import { PerspectiveCamera, Scene, Vector3, WebGLRenderer } from "three";
+import {
+  Mesh,
+  MeshBasicMaterial,
+  PerspectiveCamera,
+  PlaneGeometry,
+  Scene,
+  Vector3,
+  WebGLRenderer,
+} from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { spawnObject } from "../functions";
 import { PlantManager, RaycastManager } from "../Manager";
@@ -9,6 +17,8 @@ import { PlaceHolder } from "../Manager/Placeholder";
 import { CoinUI } from "../ui/CoinUi";
 import { CROP_CONFIG, CropSelector } from "../ui/CropSelector";
 import { Ground } from "./Ground";
+
+const ANIMAL_CROPS = ["chicken", "sheep", "cow"];
 
 export class SceneManager {
   private scene: Scene;
@@ -24,6 +34,7 @@ export class SceneManager {
   private plantManager = new PlantManager();
   private raycast = new RaycastManager();
   private cropSelector!: CropSelector;
+  private animalSelector!: CropSelector;
   private coinUI = new CoinUI();
   private dayNightToggle = new DayNightToggle();
   private ligthsManger = new LightsManager();
@@ -36,6 +47,8 @@ export class SceneManager {
   private isDay = true;
   private isSelectorOpen = false;
   private selectorJustClosed = false;
+  private isAnimalSelectorOpen = false;
+  private animalSelectorJustClosed = false;
 
   constructor(container: HTMLCanvasElement, pixiCanvas: HTMLCanvasElement) {
     this.threeCanvas = container;
@@ -59,6 +72,20 @@ export class SceneManager {
     this.setupOrbitControls();
     this.init();
     this.ligthsManger.createLights(this.scene, this.renderer);
+  }
+
+  private spawnFenceTrigger(x: number, z: number) {
+    const geometry = new PlaneGeometry(14, 14);
+    const material = new MeshBasicMaterial({
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+    });
+    const plane = new Mesh(geometry, material);
+    plane.name = "fence_trigger";
+    plane.rotation.x = -Math.PI / 2;
+    plane.position.set(x, 0.1, z);
+    this.scene.add(plane);
   }
 
   private setupOrbitControls() {
@@ -96,6 +123,31 @@ export class SceneManager {
       }
     });
 
+    this.animalSelector = new CropSelector(
+      (crop) => {
+        if (!ANIMAL_CROPS.includes(crop)) return;
+        const config = CROP_CONFIG[crop];
+        if (!this.coinUI.spend(config.price)) return;
+
+        if (this.pendingPosition) {
+          const offsetX = (Math.random() - 0.5) * 4;
+          const offsetZ = (Math.random() - 0.5) * 4;
+          spawnObject(
+            this.scene,
+            this.pendingPosition.x + offsetX,
+            0,
+            this.pendingPosition.z + offsetZ,
+            `${crop}_1`,
+          );
+        }
+      },
+      () => {
+        this.isAnimalSelectorOpen = false;
+        this.animalSelectorJustClosed = true;
+        this.pendingPosition = null;
+      },
+    );
+
     this.cropSelector = new CropSelector(
       (crop) => {
         this.isSelectorOpen = false;
@@ -106,7 +158,7 @@ export class SceneManager {
         const config = CROP_CONFIG[crop];
         if (!this.coinUI.spend(config.price)) return;
 
-        if (crop === "ground") {
+        if (crop === "ground" || crop === "fence") {
           if (this.pendingHit?.name === "placeholder") {
             this.placeHolder.removePlaceholder(this.scene, this.pendingHit);
           }
@@ -115,8 +167,14 @@ export class SceneManager {
             this.pendingPosition.x,
             0,
             this.pendingPosition.z,
-            "ground",
+            crop,
           );
+          if (crop === "fence") {
+            this.spawnFenceTrigger(
+              this.pendingPosition.x,
+              this.pendingPosition.z,
+            );
+          }
         } else {
           this.plantManager.plant(
             this.scene,
@@ -152,8 +210,13 @@ export class SceneManager {
     const { clientX: x, clientY: y } = e;
     if (this.isPixiObjectAt(x, y)) return;
     if (this.isSelectorOpen) return;
+    if (this.isAnimalSelectorOpen) return;
     if (this.selectorJustClosed) {
       this.selectorJustClosed = false;
+      return;
+    }
+    if (this.animalSelectorJustClosed) {
+      this.animalSelectorJustClosed = false;
       return;
     }
 
@@ -167,9 +230,16 @@ export class SceneManager {
     );
     if (!result) return;
 
-    const { object: hit } = result;
+    const { object: hit, point } = result;
 
-    if (hit.name === "placeholder") {
+    if (hit.name === "fence_trigger") {
+      const triggerCenter = new Vector3();
+      hit.getWorldPosition(triggerCenter);
+      this.pendingPosition = new Vector3(triggerCenter.x, 0, triggerCenter.z);
+      this.pendingHit = hit;
+      this.isAnimalSelectorOpen = true;
+      this.animalSelector.show(this.stage, x, y, this.coinUI.total, ["animal"]);
+    } else if (hit.name === "placeholder") {
       const placeholderPos = new Vector3();
       hit.getWorldPosition(placeholderPos);
       this.pendingPosition = new Vector3(placeholderPos.x, 0, placeholderPos.z);

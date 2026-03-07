@@ -2,9 +2,15 @@ import { Container, Graphics, Text } from "pixi.js";
 
 export const CROP_CONFIG: Record<
   string,
-  { label: string; price: number; reward: number; category: "plant" | "ground" }
+  {
+    label: string;
+    price: number;
+    reward: number;
+    category: "plant" | "ground" | "animal";
+  }
 > = {
   ground: { label: "🟫 Buy Ground", price: 1, reward: 0, category: "ground" },
+  fence: { label: "🪵 Buy Fence", price: 2, reward: 0, category: "ground" },
   corn: { label: "🌽 Corn", price: 1, reward: 5, category: "plant" },
   grape: { label: "🍇 Grape", price: 2, reward: 8, category: "plant" },
   strawberry: {
@@ -14,6 +20,9 @@ export const CROP_CONFIG: Record<
     category: "plant",
   },
   tomato: { label: "🍅 Tomato", price: 2, reward: 7, category: "plant" },
+  chicken: { label: "🐔 Chicken", price: 3, reward: 0, category: "animal" },
+  sheep: { label: "🐑 Sheep", price: 4, reward: 0, category: "animal" },
+  cow: { label: "🐄 Cow", price: 5, reward: 0, category: "animal" },
 };
 
 export class CropSelector {
@@ -31,9 +40,10 @@ export class CropSelector {
     _x: number,
     _y: number,
     coins: number,
-    categories: ("plant" | "ground")[],
+    categories: ("plant" | "ground" | "animal")[],
+    keepOpen = false,
   ) {
-    this.hide();
+    this.hideOnly();
 
     const W = window.innerWidth;
     const H = window.innerHeight;
@@ -94,7 +104,7 @@ export class CropSelector {
       btn.addEventListener("pointerdown", (e) => {
         e.stopPropagation();
         this.onSelect(key);
-        this.hide();
+        if (!keepOpen) this.hide();
       });
 
       this.container.addChild(btn);
@@ -121,6 +131,11 @@ export class CropSelector {
 
     this.container.addChild(closeBtn);
     stage.addChild(this.container);
+  }
+
+  private hideOnly() {
+    this.container.removeChildren();
+    this.container.parent?.removeChild(this.container);
   }
 
   hide() {
