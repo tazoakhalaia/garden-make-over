@@ -14,13 +14,6 @@ export class Ground {
         ground.scale.set(1, 1, 1);
         ground.position.set(0, 0, 0);
 
-        ground.traverse((child: any) => {
-          if (child.isMesh) {
-            child.name = "ground";
-            this.meshes.push(child);
-          }
-        });
-
         scene.add(ground);
       },
       undefined,
