@@ -1,9 +1,8 @@
-import { Scene, Vector3 } from "three";
 import { Container } from "pixi.js";
-import { Camera } from "three";
+import { Camera, Scene, Vector3 } from "three";
 import { spawnObject } from "../functions";
-import { FloatingCoin } from "../ui/FloatingCoin";
 import type { CoinUI } from "../ui/CoinUi";
+import { FloatingCoin } from "../ui/FloatingCoin";
 
 export class PlantManager {
   private occupiedPositions = new Set<string>();

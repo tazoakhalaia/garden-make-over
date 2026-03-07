@@ -1,2 +1,3 @@
-export * from "./SceneManager";
 export * from "./Loader";
+export * from "./SceneManager";
+

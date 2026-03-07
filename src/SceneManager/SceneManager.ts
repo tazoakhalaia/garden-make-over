@@ -1,13 +1,14 @@
 import { Application, Container } from "pixi.js";
 import { PerspectiveCamera, Scene, Vector3, WebGLRenderer } from "three";
-import { Ground } from "./Ground";
-import { Lights } from "./Lights";
-import { PlaceHolder } from "../manager/Placeholder";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
-import { PlantManager, RaycastManager } from "../manager";
-import { CROP_CONFIG, CropSelector } from "../ui/CropSelector";
 import { spawnObject } from "../functions";
+import { PlantManager, RaycastManager } from "../Manager";
+import { DayNightToggle } from "../Manager/DayNightTogglerManager";
+import { LightsManager } from "../Manager/LightManger";
+import { PlaceHolder } from "../Manager/Placeholder";
 import { CoinUI } from "../ui/CoinUi";
+import { CROP_CONFIG, CropSelector } from "../ui/CropSelector";
+import { Ground } from "./Ground";
 
 export class SceneManager {
   private scene: Scene;
@@ -19,18 +20,20 @@ export class SceneManager {
   private orbitControl?: OrbitControls;
 
   private ground = new Ground();
-  private lights = new Lights();
   private placeHolder = new PlaceHolder();
   private plantManager = new PlantManager();
   private raycast = new RaycastManager();
   private cropSelector!: CropSelector;
   private coinUI = new CoinUI();
+  private dayNightToggle = new DayNightToggle();
+  private ligthsManger = new LightsManager();
 
   private threeCanvas: HTMLCanvasElement;
   private pixiCanvas: HTMLCanvasElement;
 
   private pendingPosition: Vector3 | null = null;
   private pendingHit: any | null = null;
+  private isDay = true;
 
   constructor(container: HTMLCanvasElement, pixiCanvas: HTMLCanvasElement) {
     this.threeCanvas = container;
@@ -49,11 +52,11 @@ export class SceneManager {
       canvas: this.threeCanvas,
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.lights.createLights(this.scene);
     this.ground.createGround(this.scene);
     this.placeHolder.createPlaceholder(this.scene);
     this.setupOrbitControls();
     this.init();
+    this.ligthsManger.createLights(this.scene, this.renderer);
   }
 
   private setupOrbitControls() {
@@ -76,6 +79,17 @@ export class SceneManager {
     this.stage.interactiveChildren = true;
 
     this.coinUI.create(this.stage);
+
+    this.dayNightToggle.create(this.stage, (isDay) => {
+      this.isDay = isDay;
+      if (isDay) {
+        this.renderer.setClearColor("#87ceeb");
+        this.ligthsManger.setDay();
+      } else {
+        this.renderer.setClearColor("#0a0a2e");
+        this.ligthsManger.setNight();
+      }
+    });
 
     const ANIMALS = ["chicken", "sheep", "cow"];
 

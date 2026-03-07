@@ -13,7 +13,12 @@ export class Ground {
         ground.name = "ground";
         ground.scale.set(1, 1, 1);
         ground.position.set(0, 0, 0);
-
+        ground.traverse((child: any) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
         scene.add(ground);
       },
       undefined,

@@ -1,6 +1,6 @@
-import { Scene, Object3D } from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import gsap from "gsap";
+import { Object3D, Scene } from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 const loader = new GLTFLoader();
 let loadedScene: Object3D | null = null;
@@ -48,6 +48,12 @@ export function spawnObject(
   object.position.set(x, y + 0.1, z);
   object.scale.set(0, 0, 0);
   object.rotation.y = Math.PI / 2;
+  object.traverse((child: any) => {
+    if (child.isMesh) {
+      child.castShadow = true;
+      child.receiveShadow = true;
+    }
+  });
 
   scene.add(object);
 
