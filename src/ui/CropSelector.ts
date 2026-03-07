@@ -2,14 +2,9 @@ import { Container, Graphics, Text } from "pixi.js";
 
 export const CROP_CONFIG: Record<
   string,
-  {
-    label: string;
-    price: number;
-    reward: number;
-    category: "plant" | "animal" | "ground";
-  }
+  { label: string; price: number; reward: number; category: "plant" | "ground" }
 > = {
-  ground: { label: "🟫 Ground", price: 1, reward: 0, category: "ground" },
+  ground: { label: "🟫 Buy Ground", price: 1, reward: 0, category: "ground" },
   corn: { label: "🌽 Corn", price: 1, reward: 5, category: "plant" },
   grape: { label: "🍇 Grape", price: 2, reward: 8, category: "plant" },
   strawberry: {
@@ -19,9 +14,6 @@ export const CROP_CONFIG: Record<
     category: "plant",
   },
   tomato: { label: "🍅 Tomato", price: 2, reward: 7, category: "plant" },
-  chicken: { label: "🐔 Chicken", price: 3, reward: 10, category: "animal" },
-  sheep: { label: "🐑 Sheep", price: 4, reward: 14, category: "animal" },
-  cow: { label: "🐄 Cow", price: 5, reward: 18, category: "animal" },
 };
 
 export class CropSelector {
@@ -34,34 +26,68 @@ export class CropSelector {
 
   show(
     stage: Container,
-    screenX: number,
-    screenY: number,
+    _x: number,
+    _y: number,
     coins: number,
-    categories: ("plant" | "animal" | "ground")[],
+    categories: ("plant" | "ground")[],
   ) {
     this.hide();
+
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+
+    const overlay = new Graphics()
+      .rect(0, 0, W, H)
+      .fill({ color: 0x000000, alpha: 0.5 });
+    overlay.eventMode = "static";
+    overlay.addEventListener("pointerdown", (e) => {
+      e.stopPropagation();
+      this.hide();
+    });
+    this.container.addChild(overlay);
 
     const filtered = Object.entries(CROP_CONFIG).filter(([, v]) =>
       categories.includes(v.category),
     );
 
+    const panelW = 220;
+    const panelH = filtered.length * 60 + 70;
+    const panelX = W / 2 - panelW / 2;
+    const panelY = H / 2 - panelH / 2;
+
+    const panel = new Graphics()
+      .roundRect(0, 0, panelW, panelH, 16)
+      .fill({ color: 0x1e1e1e });
+    panel.position.set(panelX, panelY);
+    panel.eventMode = "static";
+    panel.addEventListener("pointerdown", (e) => e.stopPropagation());
+    this.container.addChild(panel);
+
+    const title = new Text({
+      text: "Choose",
+      style: { fontSize: 16, fill: 0xffffff, fontWeight: "bold" },
+    });
+    title.anchor.set(0.5, 0);
+    title.position.set(panelX + panelW / 2, panelY + 12);
+    this.container.addChild(title);
+
     filtered.forEach(([key, crop], i) => {
       const canAfford = coins >= crop.price;
 
       const btn = new Graphics()
-        .roundRect(0, 0, 160, 44, 8)
-        .fill({ color: canAfford ? 0x4caf50 : 0x888888 });
+        .roundRect(0, 0, panelW - 20, 48, 10)
+        .fill({ color: canAfford ? 0x4caf50 : 0x555555 });
 
-      btn.position.set(screenX, screenY + i * 54);
+      btn.position.set(panelX + 10, panelY + 14 + i * 58);
       btn.eventMode = canAfford ? "dynamic" : "none";
       btn.cursor = canAfford ? "pointer" : "default";
-      btn.alpha = canAfford ? 1 : 0.6;
+      btn.alpha = canAfford ? 1 : 0.5;
 
       const label = new Text({
         text: `${crop.label}  🪙${crop.price}`,
         style: { fontSize: 14, fill: 0xffffff },
       });
-      label.position.set(10, 13);
+      label.position.set(12, 14);
       btn.addChild(label);
 
       btn.addEventListener("pointerdown", (e) => {
@@ -73,6 +99,26 @@ export class CropSelector {
       this.container.addChild(btn);
     });
 
+    const closeBtn = new Graphics()
+      .roundRect(0, 0, panelW - 20, 38, 10)
+      .fill({ color: 0xe53935 });
+    closeBtn.position.set(panelX + 10, panelY + panelH - 48);
+    closeBtn.eventMode = "dynamic";
+    closeBtn.cursor = "pointer";
+
+    const closeLabel = new Text({
+      text: "✕ Close",
+      style: { fontSize: 13, fill: 0xffffff },
+    });
+    closeLabel.position.set(12, 10);
+    closeBtn.addChild(closeLabel);
+
+    closeBtn.addEventListener("pointerdown", (e) => {
+      e.stopPropagation();
+      this.hide();
+    });
+
+    this.container.addChild(closeBtn);
     stage.addChild(this.container);
   }
 

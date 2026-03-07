@@ -149,7 +149,7 @@ export class SceneManager {
     );
     if (!result) return;
 
-    const { object: hit, point } = result;
+    const { object: hit } = result;
 
     if (hit.name === "placeholder") {
       const placeholderPos = new Vector3();
@@ -158,7 +158,10 @@ export class SceneManager {
       this.pendingHit = hit;
       this.cropSelector.show(this.stage, x, y, this.coinUI.total, ["ground"]);
     } else if (hit.name.startsWith("ground")) {
-      this.pendingPosition = new Vector3(point.x, 0, point.z);
+      const groundCenter = new Vector3();
+      hit.getWorldPosition(groundCenter);
+
+      this.pendingPosition = new Vector3(groundCenter.x, 0, groundCenter.z);
       this.pendingHit = hit;
       this.cropSelector.show(this.stage, x, y, this.coinUI.total, ["plant"]);
     }
