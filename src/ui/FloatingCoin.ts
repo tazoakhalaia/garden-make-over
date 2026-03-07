@@ -5,6 +5,7 @@ import gsap from "gsap";
 export class FloatingCoin {
   private container = new Container();
   private collected = false;
+  private animFrameId: number | null = null;
 
   spawn(
     stage: Container,
@@ -20,23 +21,26 @@ export class FloatingCoin {
     this.container.addChild(bg, icon);
     this.container.eventMode = "dynamic";
     this.container.cursor = "pointer";
+    stage.addChild(this.container);
 
-    const screen = this.toScreen(worldPosition, camera, canvas);
-    this.container.position.set(screen.x, screen.y - 40);
-
-    gsap.to(this.container, {
-      y: screen.y - 80,
-      duration: 0.6,
-      ease: "power2.out",
-    });
+    const update = () => {
+      if (this.collected) return;
+      const screen = this.toScreen(worldPosition, camera, canvas);
+      this.container.position.set(screen.x, screen.y - 60);
+      this.animFrameId = requestAnimationFrame(update);
+    };
+    this.animFrameId = requestAnimationFrame(update);
 
     this.container.addEventListener("pointerdown", (e) => {
       e.stopPropagation();
       if (this.collected) return;
       this.collected = true;
 
+      if (this.animFrameId !== null) {
+        cancelAnimationFrame(this.animFrameId);
+      }
+
       gsap.to(this.container, {
-        y: screen.y - 120,
         alpha: 0,
         duration: 0.3,
         onComplete: () => {
@@ -45,8 +49,6 @@ export class FloatingCoin {
         },
       });
     });
-
-    stage.addChild(this.container);
   }
 
   private toScreen(
