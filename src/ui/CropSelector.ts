@@ -1,6 +1,9 @@
 import { Container, Graphics, Text } from "pixi.js";
 
-export const CROP_CONFIG: Record<string, { label: string; price: number; reward: number }> = {
+export const CROP_CONFIG: Record<
+  string,
+  { label: string; price: number; reward: number }
+> = {
   corn: { label: "🌽 Corn", price: 1, reward: 5 },
   grape: { label: "🍇 Grape", price: 2, reward: 8 },
   strawberry: { label: "🍓 Strawberry", price: 3, reward: 12 },

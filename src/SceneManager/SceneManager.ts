@@ -110,7 +110,7 @@ export class SceneManager {
             this.pendingPosition.x,
             this.pendingPosition.y,
             this.pendingPosition.z,
-            "sheep_1",
+            "ground",
           );
         }
         this.plantManager.plant(
