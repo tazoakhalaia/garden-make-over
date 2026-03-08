@@ -286,6 +286,8 @@ export class SceneManager {
       this.coinUI,
       this.cam,
       (x, z) => this.spawnFenceTrigger(x, z),
+      this.placeHolder,
+      this.plantManager,
     );
 
     this.cropSelector = createCropSelector(

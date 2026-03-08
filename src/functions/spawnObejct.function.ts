@@ -28,9 +28,9 @@ export function spawnPlant(
   y: number,
   z: number,
   itemName: string,
-) {
+): Object3D | undefined {
   const template = objectMap.get(itemName);
-  if (!template) return;
+  if (!template) return undefined;
 
   const object = template.clone();
   object.position.set(x, y, z);
@@ -51,6 +51,8 @@ export function spawnPlant(
     duration: 0.5,
     ease: "back.out(1.7)",
   });
+
+  return object;
 }
 
 export function spawnAnimal(

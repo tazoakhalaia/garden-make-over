@@ -1,5 +1,5 @@
 import { Container } from "pixi.js";
-import { Camera, Scene, Vector3 } from "three";
+import { Camera, Object3D, Scene, Vector3 } from "three";
 import { spawnPlant } from "../functions";
 import type { CoinUI } from "../ui/CoinUi";
 import { FloatingCoin } from "../ui/FloatingCoin";
@@ -42,6 +42,26 @@ export class PlantManager {
         }
       }, i * 2000);
     });
+  }
+
+  removeAllAtPosition(scene: Scene, x: number, z: number) {
+    const toRemove: Object3D[] = [];
+    scene.children.forEach((child) => {
+      if (
+        Math.abs(child.position.x - x) < 3 &&
+        Math.abs(child.position.z - z) < 3 &&
+        child.name !== "placeholder" &&
+        child.name !== "fence_trigger" &&
+        child.name !== "ground" &&
+        child.name !== "fence"
+      ) {
+        toRemove.push(child);
+      }
+    });
+    toRemove.forEach((obj) => scene.remove(obj));
+
+    const key = this.positionKey(x, z);
+    this.occupiedPositions.delete(key);
   }
 
   private removeByPosition(scene: Scene, position: Vector3, name: string) {

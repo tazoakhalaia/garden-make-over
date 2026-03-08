@@ -2,7 +2,7 @@ import gsap from "gsap";
 import { PerspectiveCamera, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 
-export const DEFAULT_CAM = { x: 0, y: 22, z: 15 };
+export const DEFAULT_CAM = { x: 0, y: 25, z: 12 };
 export const DEFAULT_LOOKAT = { x: 0, y: 0, z: 0 };
 
 export class CameraController {

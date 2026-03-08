@@ -1,6 +1,7 @@
 import { Container } from "pixi.js";
 import { Scene, Vector3 } from "three";
 import type { PlantManager } from "../Manager";
+import { placedItemsStore } from "../Manager/PlaceItemStore";
 import type { PlaceHolder } from "../Manager/Placeholder";
 import { soundManager } from "../Manager/SoundManager";
 import { CROP_CONFIG } from "../config/CropConfig";
@@ -26,14 +27,21 @@ const ANIMAL_SOUND_MAP: Record<string, "chicken" | "cow" | "sheep"> = {
   sheep: "sheep",
 };
 
+let _itemIdCounter = 0;
+function nextId() {
+  return `item_${++_itemIdCounter}`;
+}
+
 export function createAnimalSelector(
   state: SelectorState,
   scene: Scene,
   coinUI: CoinUI,
   cam: CameraController,
   spawnFence: (x: number, z: number) => void,
+  placeHolder: PlaceHolder,
+  plantManager: PlantManager,
 ): CropSelector {
-  return new CropSelector(
+  const selector = new CropSelector(
     (crop) => {
       if (!ANIMAL_CROPS.includes(crop)) return;
       const config = CROP_CONFIG[crop];
@@ -59,6 +67,17 @@ export function createAnimalSelector(
       cam.zoomOut();
     },
   );
+
+  selector.setContext(
+    scene,
+    coinUI,
+    (x, z) => placeHolder.restorePlaceholder(scene, x, z),
+    plantManager,
+    cam,
+    state,
+  );
+
+  return selector;
 }
 
 export function createCropSelector(
@@ -73,7 +92,7 @@ export function createCropSelector(
   spawnFence: (x: number, z: number) => void,
   onTutorialCornClick: () => void,
 ): CropSelector {
-  return new CropSelector(
+  const selector = new CropSelector(
     (crop) => {
       state.isSelectorOpen = false;
       state.selectorJustClosed = true;
@@ -90,15 +109,35 @@ export function createCropSelector(
         if (state.pendingHit?.name === "placeholder") {
           placeHolder.removePlaceholder(scene, state.pendingHit);
         }
-        spawnPlant(
+
+        const spawnedObject = spawnPlant(
           scene,
           state.pendingPosition.x,
           0,
           state.pendingPosition.z,
           crop,
         );
-        if (crop === "fence")
+
+        let fenceTriggerObj: any = undefined;
+        if (crop === "fence") {
           spawnFence(state.pendingPosition.x, state.pendingPosition.z);
+          fenceTriggerObj = [...scene.children]
+            .reverse()
+            .find((c) => c.name === "fence_trigger");
+        }
+
+        if (spawnedObject) {
+          placedItemsStore.add({
+            id: nextId(),
+            type: crop as "ground" | "fence",
+            object: spawnedObject,
+            fenceTrigger: fenceTriggerObj,
+            price: config.price,
+            label: config.label.replace("Buy ", "Sell "),
+            x: state.pendingPosition.x,
+            z: state.pendingPosition.z,
+          });
+        }
       } else {
         plantManager.plant(
           scene,
@@ -121,4 +160,15 @@ export function createCropSelector(
       cam.zoomOut();
     },
   );
+
+  selector.setContext(
+    scene,
+    coinUI,
+    (x, z) => placeHolder.restorePlaceholder(scene, x, z),
+    plantManager,
+    cam,
+    state,
+  );
+
+  return selector;
 }
