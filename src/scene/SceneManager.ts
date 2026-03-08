@@ -106,9 +106,21 @@ export class SceneManager {
     );
     if (!firstPlaceholder) return;
 
+    this.cam.camera.updateMatrixWorld();
+
     const worldPos = new Vector3();
     firstPlaceholder.getWorldPosition(worldPos);
     const screen = this.cam.toScreen(worldPos);
+
+    if (
+      screen.x < 0 ||
+      screen.x > window.innerWidth ||
+      screen.y < 0 ||
+      screen.y > window.innerHeight
+    ) {
+      requestAnimationFrame(() => this.startTutorial());
+      return;
+    }
 
     this.tutorial.start(
       this.stage,
@@ -205,11 +217,16 @@ export class SceneManager {
     this.pixiCanvas.addEventListener("pointerdown", (e) =>
       this.onPointerDown(e),
     );
-    setTimeout(() => this.startTutorial(), 500);
 
     hideLoadingScreen();
     await showSoundPrompt();
+
     this.render();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        this.startTutorial();
+      });
+    });
   }
 
   private onPointerDown(e: PointerEvent) {
