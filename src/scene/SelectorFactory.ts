@@ -4,7 +4,8 @@ import { spawnAnimal, spawnPlant } from "../functions";
 import type { PlantManager } from "../Manager";
 import type { PlaceHolder } from "../Manager/Placeholder";
 import type { CoinUI } from "../ui/CoinUi";
-import { CROP_CONFIG, CropSelector } from "../ui/CropSelector";
+import { CROP_CONFIG } from "../ui/cropConfig";
+import { CropSelector } from "../ui/CropSelector";
 import { CameraController } from "./CameraController";
 
 export const ANIMAL_CROPS = ["chicken", "sheep", "cow"];
