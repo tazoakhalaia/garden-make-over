@@ -14,6 +14,7 @@ import { LightsManager } from "../Manager/LightManger";
 import { PlaceHolder } from "../Manager/Placeholder";
 import { CoinUI } from "../ui/CoinUi";
 import { CropSelector } from "../ui/CropSelector";
+import { showSoundPrompt } from "../ui/Soundprompt";
 import { CameraController } from "./CameraController";
 import { handleClick, type ClickHandlerDeps } from "./ClickHandler";
 import { Ground } from "./Ground";
@@ -207,6 +208,7 @@ export class SceneManager {
     setTimeout(() => this.startTutorial(), 500);
 
     hideLoadingScreen();
+    await showSoundPrompt();
     this.render();
   }
 

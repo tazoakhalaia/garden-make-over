@@ -1,13 +1,13 @@
 import { Application, Container } from "pixi.js";
 import { Scene, Vector3 } from "three";
 import type { RaycastManager } from "../Manager";
+import { soundManager } from "../Manager/SoundManager";
 import type { CoinUI } from "../ui/CoinUi";
 import type { CropSelector } from "../ui/CropSelector";
 import { CameraController } from "./CameraController";
 import type { SelectorState } from "./SelectorFactory";
 
 const STEP_CLICK_PLACEHOLDER = 0;
-const STEP_CLICK_CORN = 1;
 
 export interface ClickHandlerDeps {
   app: Application;
@@ -72,6 +72,7 @@ export function handleClick(e: PointerEvent, deps: ClickHandlerDeps) {
     state.pendingHit = hit;
     state.isAnimalSelectorOpen = true;
     cam.zoomTo(center);
+    soundManager.play("popup");
     animalSelector.show(stage, x, y, coinUI.total, ["animal"], false, false);
   } else if (hit.name === "placeholder") {
     const pos = new Vector3();
@@ -80,6 +81,7 @@ export function handleClick(e: PointerEvent, deps: ClickHandlerDeps) {
     state.pendingHit = hit;
     state.isSelectorOpen = true;
     cam.zoomTo(pos);
+    soundManager.play("popup");
     cropSelector.show(
       stage,
       x,
@@ -99,6 +101,7 @@ export function handleClick(e: PointerEvent, deps: ClickHandlerDeps) {
     state.pendingHit = hit;
     state.isSelectorOpen = true;
     cam.zoomTo(pos);
+    soundManager.play("popup");
     cropSelector.show(
       stage,
       x,

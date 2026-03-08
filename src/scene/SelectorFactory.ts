@@ -1,11 +1,12 @@
 import { Container } from "pixi.js";
 import { Scene, Vector3 } from "three";
-import { spawnAnimal, spawnPlant } from "../functions";
 import type { PlantManager } from "../Manager";
 import type { PlaceHolder } from "../Manager/Placeholder";
+import { soundManager } from "../Manager/SoundManager";
+import { spawnAnimal, spawnPlant } from "../functions";
 import type { CoinUI } from "../ui/CoinUi";
-import { CROP_CONFIG } from "../ui/cropConfig";
 import { CropSelector } from "../ui/CropSelector";
+import { CROP_CONFIG } from "../ui/cropConfig";
 import { CameraController } from "./CameraController";
 
 export const ANIMAL_CROPS = ["chicken", "sheep", "cow"];
@@ -18,6 +19,12 @@ export interface SelectorState {
   pendingPosition: Vector3 | null;
   pendingHit: any | null;
 }
+
+const ANIMAL_SOUND_MAP: Record<string, "chicken" | "cow" | "sheep"> = {
+  chicken: "chicken",
+  cow: "cow",
+  sheep: "sheep",
+};
 
 export function createAnimalSelector(
   state: SelectorState,
@@ -32,6 +39,10 @@ export function createAnimalSelector(
       const config = CROP_CONFIG[crop];
       if (!coinUI.spend(config.price)) return;
       if (!state.pendingPosition) return;
+
+      const sound = ANIMAL_SOUND_MAP[crop];
+      if (sound) soundManager.play(sound);
+
       const offsetX = (Math.random() - 0.5) * 4;
       const offsetZ = (Math.random() - 0.5) * 4;
       spawnAnimal(
@@ -66,11 +77,14 @@ export function createCropSelector(
     (crop) => {
       state.isSelectorOpen = false;
       state.selectorJustClosed = true;
+      cam.zoomOut();
       onTutorialCornClick();
 
       if (!state.pendingPosition) return;
       const config = CROP_CONFIG[crop];
       if (!coinUI.spend(config.price)) return;
+
+      soundManager.play("click");
 
       if (crop === "ground" || crop === "fence") {
         if (state.pendingHit?.name === "placeholder") {
