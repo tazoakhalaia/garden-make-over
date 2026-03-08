@@ -3,10 +3,10 @@ import { Scene, Vector3 } from "three";
 import type { PlantManager } from "../Manager";
 import type { PlaceHolder } from "../Manager/Placeholder";
 import { soundManager } from "../Manager/SoundManager";
+import { CROP_CONFIG } from "../config/CropConfig";
 import { spawnAnimal, spawnPlant } from "../functions";
 import type { CoinUI } from "../ui/CoinUi";
 import { CropSelector } from "../ui/CropSelector";
-import { CROP_CONFIG } from "../ui/cropConfig";
 import { CameraController } from "./CameraController";
 
 export const ANIMAL_CROPS = ["chicken", "sheep", "cow"];

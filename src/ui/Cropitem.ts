@@ -1,5 +1,5 @@
 import { Container, Graphics, Sprite, Text } from "pixi.js";
-import type { CropEntry } from "./cropConfig";
+import type { CropEntry } from "../config/CropConfig";
 import { addCoinSprite, drawGradientCard, tryGetTexture } from "./drawUtils";
 
 const ITEM_H = 88;
@@ -40,13 +40,11 @@ export function buildCropItem(
   btn.alpha = canAfford ? 1 : 0.42;
   container.addChild(btn);
 
-  const cardBorder = new Graphics()
-    .roundRect(0, 0, btnW, ITEM_H, 14)
-    .stroke({
-      color: canAfford ? 0x3ddc6e : 0x2a3a2e,
-      width: 1.2,
-      alpha: canAfford ? 0.5 : 0.25,
-    });
+  const cardBorder = new Graphics().roundRect(0, 0, btnW, ITEM_H, 14).stroke({
+    color: canAfford ? 0x3ddc6e : 0x2a3a2e,
+    width: 1.2,
+    alpha: canAfford ? 0.5 : 0.25,
+  });
   cardBorder.position.set(btnX, btnY);
   container.addChild(cardBorder);
 
@@ -206,4 +204,3 @@ function buildPricePill(
 }
 
 export { ITEM_H };
-

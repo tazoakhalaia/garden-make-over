@@ -1,8 +1,8 @@
 import { Container, Graphics } from "pixi.js";
-import { CROP_CONFIG, type CropCategory } from "./cropConfig";
-import { buildHeader, HEADER_H } from "./Panelheader";
-import { buildCropItem, ITEM_H } from "./Cropitem";
+import { CROP_CONFIG, type CropCategory } from "../config/CropConfig";
 import { buildCloseButton } from "./Closebutton";
+import { buildCropItem, ITEM_H } from "./Cropitem";
+import { buildHeader, HEADER_H } from "./Panelheader";
 
 const PANEL_W = 400;
 const GAP = 10;
