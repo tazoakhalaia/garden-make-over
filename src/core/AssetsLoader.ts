@@ -6,7 +6,7 @@ const ASSET_MANIFEST = {
   strawberry: "public/images/strawberry.png",
   tomato: "public/images/tomato.png",
 
-  chicken: "public/images/cow.png",
+  chicken: "public/images/chicken.png",
   sheep: "public/images/sheep.png",
   cow: "public/images/cow.png",
 

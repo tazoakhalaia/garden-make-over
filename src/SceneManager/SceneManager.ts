@@ -10,6 +10,7 @@ import {
   WebGLRenderer,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
+import { AssetLoader } from "../core";
 import { spawnAnimal, spawnPlant } from "../functions";
 import { PlantManager, RaycastManager, Tutorial } from "../Manager";
 import { DayNightToggle } from "../Manager/DayNightTogglerManager";
@@ -68,6 +69,7 @@ export class SceneManager {
   constructor(container: HTMLCanvasElement, pixiCanvas: HTMLCanvasElement) {
     this.threeCanvas = container;
     this.pixiCanvas = pixiCanvas;
+
     this.scene = new Scene();
     this.camera = new PerspectiveCamera(
       75,
@@ -77,16 +79,18 @@ export class SceneManager {
     );
     this.camera.position.set(DEFAULT_CAM.x, DEFAULT_CAM.y, DEFAULT_CAM.z);
     this.camera.lookAt(DEFAULT_LOOKAT.x, DEFAULT_LOOKAT.y, DEFAULT_LOOKAT.z);
+
     this.renderer = new WebGLRenderer({
       antialias: true,
       canvas: this.threeCanvas,
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
+
     this.ground.createGround(this.scene);
     this.placeHolder.createPlaceholder(this.scene);
-    this.setupOrbitControls();
-    this.init();
     this.ligthsManger.createLights(this.scene, this.renderer);
+
+    this.init();
   }
 
   private spawnFenceTrigger(x: number, z: number) {
@@ -115,10 +119,8 @@ export class SceneManager {
 
   private zoomTo(worldPos: Vector3) {
     if (this.orbitControl) this.orbitControl.enabled = false;
-
     gsap.killTweensOf(this.camera.position);
     gsap.killTweensOf(this.lookAt);
-
     gsap.to(this.camera.position, {
       x: worldPos.x,
       y: 12,
@@ -126,7 +128,6 @@ export class SceneManager {
       duration: 0.6,
       ease: "power2.inOut",
     });
-
     gsap.to(this.lookAt, {
       x: worldPos.x,
       y: 0,
@@ -134,13 +135,11 @@ export class SceneManager {
       duration: 0.6,
       ease: "power2.inOut",
       onUpdate: () => {
-        if (this.orbitControl) {
-          this.orbitControl.target.set(
-            this.lookAt.x,
-            this.lookAt.y,
-            this.lookAt.z,
-          );
-        }
+        this.orbitControl?.target.set(
+          this.lookAt.x,
+          this.lookAt.y,
+          this.lookAt.z,
+        );
       },
     });
   }
@@ -148,7 +147,6 @@ export class SceneManager {
   private zoomOut() {
     gsap.killTweensOf(this.camera.position);
     gsap.killTweensOf(this.lookAt);
-
     gsap.to(this.camera.position, {
       x: DEFAULT_CAM.x,
       y: DEFAULT_CAM.y,
@@ -159,7 +157,6 @@ export class SceneManager {
         if (this.orbitControl) this.orbitControl.enabled = true;
       },
     });
-
     gsap.to(this.lookAt, {
       x: DEFAULT_LOOKAT.x,
       y: DEFAULT_LOOKAT.y,
@@ -167,13 +164,11 @@ export class SceneManager {
       duration: 0.6,
       ease: "power2.inOut",
       onUpdate: () => {
-        if (this.orbitControl) {
-          this.orbitControl.target.set(
-            this.lookAt.x,
-            this.lookAt.y,
-            this.lookAt.z,
-          );
-        }
+        this.orbitControl?.target.set(
+          this.lookAt.x,
+          this.lookAt.y,
+          this.lookAt.z,
+        );
       },
     });
   }
@@ -230,7 +225,55 @@ export class SceneManager {
     this.tutorialStep = STEP_CLICK_CORN;
   }
 
+  private showLoadingScreen(): HTMLDivElement {
+    const overlay = document.createElement("div");
+    overlay.id = "asset-loading-overlay";
+    Object.assign(overlay.style, {
+      position: "fixed",
+      inset: "0",
+      background: "#0a0f0a",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: "9999",
+      fontFamily: "sans-serif",
+      color: "#a8f5b8",
+    });
+    overlay.innerHTML = `
+      <div style="font-size:48px;margin-bottom:24px;">🌱</div>
+      <div style="font-size:20px;font-weight:bold;letter-spacing:3px;margin-bottom:20px;">LOADING FARM...</div>
+      <div style="width:260px;height:12px;background:#1a3d22;border-radius:6px;overflow:hidden;border:1px solid #2d6a3f;">
+        <div id="asset-loading-bar" style="width:0%;height:100%;background:linear-gradient(90deg,#4ade80,#22c55e);border-radius:6px;transition:width 0.15s ease;"></div>
+      </div>
+      <div id="asset-loading-pct" style="margin-top:10px;font-size:13px;opacity:0.7;">0%</div>
+    `;
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  private updateLoadingBar(progress: number) {
+    const bar = document.getElementById("asset-loading-bar");
+    const pct = document.getElementById("asset-loading-pct");
+    if (bar) bar.style.width = `${progress}%`;
+    if (pct) pct.textContent = `${progress}%`;
+  }
+
+  private hideLoadingScreen() {
+    const overlay = document.getElementById("asset-loading-overlay");
+    if (!overlay) return;
+    overlay.style.transition = "opacity 0.4s ease";
+    overlay.style.opacity = "0";
+    setTimeout(() => overlay.remove(), 420);
+  }
+
   async init() {
+    this.showLoadingScreen();
+
+    await AssetLoader.loadAll((progress) => {
+      this.updateLoadingBar(progress);
+    });
+
     this.app = new Application();
     await this.app.init({
       canvas: this.pixiCanvas,
@@ -262,7 +305,6 @@ export class SceneManager {
         const config = CROP_CONFIG[crop];
         if (!this.coinUI.spend(config.price)) return;
         if (!this.pendingPosition) return;
-
         const offsetX = (Math.random() - 0.5) * 4;
         const offsetZ = (Math.random() - 0.5) * 4;
         spawnAnimal(
@@ -338,6 +380,8 @@ export class SceneManager {
 
     this.pixiCanvas.addEventListener("pointerdown", (e) => this.handleClick(e));
     setTimeout(() => this.startTutorial(), 500);
+
+    this.hideLoadingScreen();
     this.render();
   }
 
@@ -378,7 +422,15 @@ export class SceneManager {
       this.pendingHit = hit;
       this.isAnimalSelectorOpen = true;
       this.zoomTo(center);
-      this.animalSelector.show(this.stage, x, y, this.coinUI.total, ["animal"]);
+      this.animalSelector.show(
+        this.stage,
+        x,
+        y,
+        this.coinUI.total,
+        ["animal"],
+        false,
+        false,
+      );
     } else if (hit.name === "placeholder") {
       const pos = new Vector3();
       hit.getWorldPosition(pos);
@@ -386,7 +438,15 @@ export class SceneManager {
       this.pendingHit = hit;
       this.isSelectorOpen = true;
       this.zoomTo(pos);
-      this.cropSelector.show(this.stage, x, y, this.coinUI.total, ["ground"]);
+      this.cropSelector.show(
+        this.stage,
+        x,
+        y,
+        this.coinUI.total,
+        ["ground"],
+        false,
+        this.tutorialActive,
+      );
 
       if (this.tutorialActive && this.tutorialStep === STEP_CLICK_PLACEHOLDER) {
         setTimeout(() => this.advanceTutorialToCorn(), 150);
@@ -398,7 +458,15 @@ export class SceneManager {
       this.pendingHit = hit;
       this.isSelectorOpen = true;
       this.zoomTo(pos);
-      this.cropSelector.show(this.stage, x, y, this.coinUI.total, ["plant"]);
+      this.cropSelector.show(
+        this.stage,
+        x,
+        y,
+        this.coinUI.total,
+        ["plant"],
+        false,
+        this.tutorialActive,
+      );
     }
   }
 
