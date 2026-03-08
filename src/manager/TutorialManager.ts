@@ -14,6 +14,7 @@ export class Tutorial {
   private steps: TutorialStep[] = [];
   private currentStep = 0;
   private onComplete?: () => void;
+  private baseTargetY = 0;
 
   constructor() {
     this.finger = new Text({ text: "👆", style: { fontSize: 40 } });
@@ -58,12 +59,34 @@ export class Tutorial {
     );
     this.container.addChild(this.bubble);
 
+    this.baseTargetY = step.targetY;
     this.finger.position.set(step.targetX - 16, step.targetY);
     this.container.addChild(this.finger);
 
     gsap.killTweensOf(this.finger);
     gsap.to(this.finger, {
       y: step.targetY + 12,
+      duration: 0.5,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+  }
+
+  updateTarget(x: number, y: number) {
+    if (!this.steps.length) return;
+
+    this.steps[this.currentStep].targetX = x;
+    this.steps[this.currentStep].targetY = y;
+
+    this.bubble.position.set(x - this.bubble.width / 2, y - 100);
+
+    this.baseTargetY = y;
+    this.finger.position.set(x - 16, y);
+
+    gsap.killTweensOf(this.finger);
+    gsap.to(this.finger, {
+      y: y + 12,
       duration: 0.5,
       repeat: -1,
       yoyo: true,

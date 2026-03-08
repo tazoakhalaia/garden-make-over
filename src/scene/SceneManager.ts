@@ -7,6 +7,7 @@ import {
   Vector3,
   WebGLRenderer,
 } from "three";
+import { DEFAULT_CAM, DEFAULT_LOOKAT } from "../constants";
 import { AssetLoader } from "../core";
 import { PlantManager, RaycastManager, Tutorial } from "../Manager";
 import { DayNightToggle } from "../Manager/DayNightTogglerManager";
@@ -32,6 +33,11 @@ import {
 
 const STEP_CLICK_PLACEHOLDER = 0;
 const STEP_CLICK_CORN = 1;
+
+const PAN_SPEED = 0.04;
+
+const PAN_LIMIT_X = 10;
+const PAN_LIMIT_Z = 10;
 
 export class SceneManager {
   private scene = new Scene();
@@ -68,14 +74,16 @@ export class SceneManager {
     pendingHit: null,
   };
 
+  private isPanning = false;
+  private isCameraAnimating = false;
+  private panLastX = 0;
+  private panLastY = 0;
+
   constructor(threeCanvas: HTMLCanvasElement, pixiCanvas: HTMLCanvasElement) {
     this.threeCanvas = threeCanvas;
     this.pixiCanvas = pixiCanvas;
 
-    this.cam = new CameraController(
-      threeCanvas.clientWidth,
-      threeCanvas.clientHeight,
-    );
+    this.cam = new CameraController(window.innerWidth, window.innerHeight);
 
     this.renderer = new WebGLRenderer({ antialias: true, canvas: threeCanvas });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -224,6 +232,8 @@ export class SceneManager {
       },
     );
 
+    this.setupPanListeners();
+
     this.pixiCanvas.addEventListener("pointerdown", (e) =>
       this.onPointerDown(e),
     );
@@ -237,6 +247,63 @@ export class SceneManager {
         this.startTutorial();
       });
     });
+  }
+
+  private setupPanListeners() {
+    this.pixiCanvas.addEventListener("pointerdown", (e) => this.onPanStart(e));
+    this.pixiCanvas.addEventListener("pointermove", (e) => this.onPanMove(e));
+    this.pixiCanvas.addEventListener("pointerup", () => this.onPanEnd());
+    this.pixiCanvas.addEventListener("pointercancel", () => this.onPanEnd());
+    this.pixiCanvas.addEventListener("pointerleave", () => this.onPanEnd());
+  }
+
+  private onPanStart(e: PointerEvent) {
+    if (this.isCameraAnimating) return;
+    this.isPanning = true;
+    this.panLastX = e.clientX;
+    this.panLastY = e.clientY;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  private onPanMove(e: PointerEvent) {
+    if (!this.isPanning || this.isCameraAnimating) return;
+
+    const dx = e.clientX - this.panLastX;
+    const dy = e.clientY - this.panLastY;
+    this.panLastX = e.clientX;
+    this.panLastY = e.clientY;
+
+    const newX = Math.max(
+      DEFAULT_CAM.x - PAN_LIMIT_X,
+      Math.min(
+        DEFAULT_CAM.x + PAN_LIMIT_X,
+        this.cam.camera.position.x - dx * PAN_SPEED,
+      ),
+    );
+    const newZ = Math.max(
+      DEFAULT_CAM.z - PAN_LIMIT_Z,
+      Math.min(
+        DEFAULT_CAM.z + PAN_LIMIT_Z,
+        this.cam.camera.position.z - dy * PAN_SPEED,
+      ),
+    );
+
+    this.cam.camera.position.x = newX;
+    this.cam.camera.position.z = newZ;
+
+    this.cam.panLookAt(newX, newZ - (DEFAULT_CAM.z - DEFAULT_LOOKAT.z));
+  }
+
+  private onPanEnd() {
+    this.isPanning = false;
+  }
+
+  private disableOrbitDuringAnimation(durationMs: number) {
+    this.isCameraAnimating = true;
+    this.isPanning = false;
+    setTimeout(() => {
+      this.isCameraAnimating = false;
+    }, durationMs);
   }
 
   private onPointerDown(e: PointerEvent) {
@@ -253,14 +320,33 @@ export class SceneManager {
       state: this.state,
       tutorialState: this.tutorialState,
       onAdvanceTutorial: () => this.advanceTutorialToCorn(),
+      onCameraAnimate: () => this.disableOrbitDuringAnimation(700),
     };
     handleClick(e, deps);
+  }
+
+  private updateTutorialPosition() {
+    if (!this.tutorialState.active) return;
+    if (this.tutorialState.step !== STEP_CLICK_PLACEHOLDER) return;
+
+    const firstPlaceholder = this.scene.children.find(
+      (c) => c.name === "placeholder",
+    );
+    if (!firstPlaceholder) return;
+
+    this.cam.camera.updateMatrixWorld();
+    const worldPos = new Vector3();
+    firstPlaceholder.getWorldPosition(worldPos);
+    const screen = this.cam.toScreen(worldPos);
+
+    this.tutorial.updateTarget(screen.x, screen.y);
   }
 
   private render = () => {
     requestAnimationFrame(this.render);
     this.cam.tick();
     this.weatherParticles.update();
+    this.updateTutorialPosition();
     this.renderer.render(this.scene, this.cam.camera);
     this.app?.renderer.render({ container: this.stage, clear: false });
   };

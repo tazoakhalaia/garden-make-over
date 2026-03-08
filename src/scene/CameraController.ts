@@ -1,14 +1,10 @@
 import gsap from "gsap";
 import { PerspectiveCamera, Vector3 } from "three";
-import { OrbitControls } from "three/examples/jsm/Addons.js";
-
-export const DEFAULT_CAM = { x: 0, y: 25, z: 12 };
-export const DEFAULT_LOOKAT = { x: 0, y: 0, z: 0 };
+import { DEFAULT_CAM, DEFAULT_LOOKAT } from "../constants";
 
 export class CameraController {
   readonly camera: PerspectiveCamera;
   private lookAt: Vector3;
-  private orbitControl?: OrbitControls;
 
   constructor(width: number, height: number) {
     this.camera = new PerspectiveCamera(75, width / height, 0.1, 1000);
@@ -22,7 +18,6 @@ export class CameraController {
   }
 
   zoomTo(worldPos: Vector3) {
-    if (this.orbitControl) this.orbitControl.enabled = false;
     gsap.killTweensOf(this.camera.position);
     gsap.killTweensOf(this.lookAt);
     gsap.to(this.camera.position, {
@@ -38,12 +33,6 @@ export class CameraController {
       z: worldPos.z,
       duration: 0.6,
       ease: "power2.inOut",
-      onUpdate: () =>
-        void this.orbitControl?.target.set(
-          this.lookAt.x,
-          this.lookAt.y,
-          this.lookAt.z,
-        ),
     });
   }
 
@@ -56,9 +45,6 @@ export class CameraController {
       z: DEFAULT_CAM.z,
       duration: 0.6,
       ease: "power2.inOut",
-      onComplete: () => {
-        if (this.orbitControl) this.orbitControl.enabled = true;
-      },
     });
     gsap.to(this.lookAt, {
       x: DEFAULT_LOOKAT.x,
@@ -66,13 +52,15 @@ export class CameraController {
       z: DEFAULT_LOOKAT.z,
       duration: 0.6,
       ease: "power2.inOut",
-      onUpdate: () =>
-        void this.orbitControl?.target.set(
-          this.lookAt.x,
-          this.lookAt.y,
-          this.lookAt.z,
-        ),
     });
+  }
+
+  panLookAt(x: number, z: number) {
+    this.lookAt.set(x, DEFAULT_LOOKAT.y, z);
+  }
+
+  getLookAt(): Vector3 {
+    return this.lookAt.clone();
   }
 
   toScreen(worldPos: Vector3): { x: number; y: number } {
@@ -85,6 +73,5 @@ export class CameraController {
 
   tick() {
     this.camera.lookAt(this.lookAt);
-    this.orbitControl?.update();
   }
 }

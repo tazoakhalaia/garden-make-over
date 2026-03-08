@@ -22,6 +22,7 @@ export interface ClickHandlerDeps {
   state: SelectorState;
   tutorialState: { active: boolean; step: number };
   onAdvanceTutorial: () => void;
+  onCameraAnimate: () => void;
 }
 
 export function handleClick(e: PointerEvent, deps: ClickHandlerDeps) {
@@ -39,6 +40,7 @@ export function handleClick(e: PointerEvent, deps: ClickHandlerDeps) {
     state,
     tutorialState,
     onAdvanceTutorial,
+    onCameraAnimate,
   } = deps;
 
   if (isPixiObjectAt(app, stage, x, y)) return;
@@ -72,6 +74,7 @@ export function handleClick(e: PointerEvent, deps: ClickHandlerDeps) {
     state.pendingHit = hit;
     state.isAnimalSelectorOpen = true;
     cam.zoomTo(center);
+    onCameraAnimate();
     soundManager.play("popup");
     animalSelector.show(stage, x, y, coinUI.total, ["animal"], false, false);
   } else if (hit.name === "placeholder") {
@@ -81,6 +84,7 @@ export function handleClick(e: PointerEvent, deps: ClickHandlerDeps) {
     state.pendingHit = hit;
     state.isSelectorOpen = true;
     cam.zoomTo(pos);
+    onCameraAnimate();
     soundManager.play("popup");
     cropSelector.show(
       stage,
@@ -101,6 +105,7 @@ export function handleClick(e: PointerEvent, deps: ClickHandlerDeps) {
     state.pendingHit = hit;
     state.isSelectorOpen = true;
     cam.zoomTo(pos);
+    onCameraAnimate();
     soundManager.play("popup");
     cropSelector.show(
       stage,
