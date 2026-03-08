@@ -1,5 +1,5 @@
+import { SceneManager } from "./scene";
 import "./style.css";
-import { SceneManager } from "./SceneManager";
 
 class App {
   private sceneManager: SceneManager;

@@ -1,6 +1,6 @@
 import type { Object3D, Scene } from "three";
-import { LoadModels } from "../SceneManager";
 import { PlaceHolderCords } from "../constants";
+import { LoadModels } from "../scene";
 
 export class PlaceHolder {
   private loader = new LoadModels();

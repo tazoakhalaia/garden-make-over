@@ -35,6 +35,31 @@ function tryGetTexture(key: string): Texture | null {
   }
 }
 
+function getCoinTexture(): Texture | null {
+  return tryGetTexture("coin");
+}
+
+function addCoinSprite(
+  container: Container,
+  x: number,
+  y: number,
+  size: number,
+): void {
+  const tex = getCoinTexture();
+  if (tex) {
+    const sprite = new Sprite(tex);
+    sprite.width = size;
+    sprite.height = size;
+    sprite.anchor.set(0.5);
+    sprite.position.set(x, y);
+    container.addChild(sprite);
+  } else {
+    const dot = new Graphics().circle(0, 0, size / 2).fill({ color: 0xffe082 });
+    dot.position.set(x, y);
+    container.addChild(dot);
+  }
+}
+
 function drawGradientCard(
   g: Graphics,
   w: number,
@@ -156,10 +181,7 @@ export class CropSelector {
       this.container.addChild(dot);
     }
 
-    const leafIcon = new Text({
-      text: "🌿",
-      style: { fontSize: 28 },
-    });
+    const leafIcon = new Text({ text: "🌿", style: { fontSize: 28 } });
     leafIcon.anchor.set(0.5);
     leafIcon.position.set(panelX + panelW / 2 - 72, panelY + 38);
     this.container.addChild(leafIcon);
@@ -191,20 +213,12 @@ export class CropSelector {
     subtitle.position.set(panelX + panelW / 2, panelY + 68);
     this.container.addChild(subtitle);
 
-    const coinDot = new Graphics().circle(0, 0, 6).fill({ color: 0xffe082 });
-    coinDot.position.set(
+    addCoinSprite(
+      this.container,
       panelX + panelW / 2 - subtitle.width / 2 - 14,
       panelY + 68,
+      14,
     );
-    this.container.addChild(coinDot);
-    const coinInner = new Graphics()
-      .circle(0, 0, 3)
-      .fill({ color: 0xffd740, alpha: 0.7 });
-    coinInner.position.set(
-      panelX + panelW / 2 - subtitle.width / 2 - 14,
-      panelY + 68,
-    );
-    this.container.addChild(coinInner);
 
     filtered.forEach(([key, crop], i) => {
       const canAfford = coins >= crop.price;
@@ -289,13 +303,15 @@ export class CropSelector {
 
       if (crop.reward > 0) {
         const badgeBg = new Graphics()
-          .roundRect(0, 0, 72, 22, 11)
+          .roundRect(0, 0, 80, 22, 11)
           .fill({ color: canAfford ? 0x0d3d1f : 0x0d1e11 });
         badgeBg.position.set(btnX + 72, btnY + 44);
         this.container.addChild(badgeBg);
 
+        addCoinSprite(this.container, btnX + 84, btnY + 55, 14);
+
         const rewardText = new Text({
-          text: `+${crop.reward} 💰`,
+          text: `+${crop.reward}`,
           style: {
             fontSize: 12,
             fill: canAfford ? 0x5fffaa : 0x2a5a35,
@@ -303,7 +319,7 @@ export class CropSelector {
           },
         });
         rewardText.anchor.set(0, 0.5);
-        rewardText.position.set(btnX + 78, btnY + 55);
+        rewardText.position.set(btnX + 94, btnY + 55);
         this.container.addChild(rewardText);
       } else if (crop.category === "ground") {
         const tagText = new Text({
@@ -329,8 +345,9 @@ export class CropSelector {
         this.container.addChild(tagText);
       }
 
-      const priceStr = `🪙 ${crop.price}`;
-      const pricePillW = 64;
+      const COIN_SIZE = 20;
+      const priceNumStr = `${crop.price}`;
+      const pricePillW = 72;
       const pricePillH = 34;
       const pillX = btnX + btnW - pricePillW - 12;
       const pillY = btnY + (ITEM_H - pricePillH) / 2;
@@ -347,16 +364,23 @@ export class CropSelector {
       pricePillBorder.position.set(pillX, pillY);
       this.container.addChild(pricePillBorder);
 
+      addCoinSprite(
+        this.container,
+        pillX + 14,
+        pillY + pricePillH / 2,
+        COIN_SIZE,
+      );
+
       const priceText = new Text({
-        text: priceStr,
+        text: priceNumStr,
         style: {
           fontSize: 15,
           fill: canAfford ? 0xffe082 : 0x404a3a,
           fontWeight: "bold",
         },
       });
-      priceText.anchor.set(0.5);
-      priceText.position.set(pillX + pricePillW / 2, pillY + pricePillH / 2);
+      priceText.anchor.set(0, 0.5);
+      priceText.position.set(pillX + 26, pillY + pricePillH / 2);
       this.container.addChild(priceText);
 
       if (canAfford) {
