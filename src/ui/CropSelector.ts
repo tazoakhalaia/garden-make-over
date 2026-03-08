@@ -35,7 +35,7 @@ export class CropSelector {
 
     const overlay = new Graphics()
       .rect(0, 0, W, H)
-      .fill({ color: 0x020b05, alpha: 0.82 });
+      .fill({ color: 0x020b05, alpha: 0.2 });
     overlay.eventMode = "static";
     overlay.on("pointerdown", (e) => e.stopPropagation());
     this.container.addChild(overlay);
