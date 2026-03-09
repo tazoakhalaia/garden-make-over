@@ -1,4 +1,4 @@
-import { soundManager } from "../Manager/SoundManager";
+import { soundManager } from "../manager/SoundManager";
 
 export function showSoundPrompt(): Promise<void> {
   return new Promise((resolve) => {

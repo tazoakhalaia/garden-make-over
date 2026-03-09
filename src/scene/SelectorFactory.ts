@@ -1,11 +1,11 @@
 import { Container } from "pixi.js";
 import { Scene, Vector3 } from "three";
-import type { PlantManager } from "../Manager";
-import { placedItemsStore } from "../Manager/PlaceItemStore";
-import type { PlaceHolder } from "../Manager/Placeholder";
-import { soundManager } from "../Manager/SoundManager";
 import { CROP_CONFIG } from "../config/CropConfig";
 import { spawnAnimal, spawnPlant } from "../functions";
+import type { PlantManager } from "../manager";
+import { placedItemsStore } from "../manager/PlaceItemStore";
+import type { PlaceHolder } from "../manager/Placeholder";
+import { soundManager } from "../manager/SoundManager";
 import type { CoinUI } from "../ui/CoinUi";
 import { CropSelector } from "../ui/CropSelector";
 import { CameraController } from "./CameraController";

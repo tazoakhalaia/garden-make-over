@@ -1,7 +1,7 @@
 import { Application, Container } from "pixi.js";
 import { Scene, Vector3 } from "three";
-import type { RaycastManager } from "../Manager";
-import { soundManager } from "../Manager/SoundManager";
+import type { RaycastManager } from "../manager";
+import { soundManager } from "../manager/SoundManager";
 import type { CoinUI } from "../ui/CoinUi";
 import type { CropSelector } from "../ui/CropSelector";
 import { CameraController } from "./CameraController";

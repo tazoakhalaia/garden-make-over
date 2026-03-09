@@ -1,13 +1,13 @@
 import gsap from "gsap";
 import { Container, Graphics, Text } from "pixi.js";
 import { Scene } from "three";
-import type { PlantManager } from "../Manager";
-import { soundManager } from "../Manager/SoundManager";
 import type { CameraController } from "../scene/CameraController";
 import type { SelectorState } from "../scene/SelectorFactory";
 import type { CoinUI } from "../ui/CoinUi";
 import { drawGradientCard } from "../ui/drawUtils";
 import { placedItemsStore, type PlacedItem } from "./PlaceItemStore";
+import { soundManager } from "./SoundManager";
+import type { PlantManager } from "./PlantManger";
 
 const PANEL_W = 400;
 const SIDE_PAD = 24;

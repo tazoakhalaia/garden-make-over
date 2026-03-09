@@ -9,11 +9,11 @@ import {
 } from "three";
 import { DEFAULT_CAM, DEFAULT_LOOKAT } from "../constants";
 import { AssetLoader } from "../core";
-import { PlantManager, RaycastManager, Tutorial } from "../Manager";
-import { DayNightToggle } from "../Manager/DayNightTogglerManager";
-import { LightsManager } from "../Manager/LightManger";
-import { PlaceHolder } from "../Manager/Placeholder";
-import { WeatherParticles } from "../Manager/WeatherParticlesManager";
+import { PlantManager, RaycastManager, Tutorial } from "../manager";
+import { DayNightToggle } from "../manager/DayNightTogglerManager";
+import { LightsManager } from "../manager/LightManger";
+import { PlaceHolder } from "../manager/Placeholder";
+import { WeatherParticles } from "../manager/WeatherParticlesManager";
 import { CoinUI } from "../ui/CoinUi";
 import { CropSelector } from "../ui/CropSelector";
 import { showSoundPrompt } from "../ui/Soundprompt";

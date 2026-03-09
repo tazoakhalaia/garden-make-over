@@ -1,9 +1,9 @@
 import { Container, Graphics, Text } from "pixi.js";
 import { Scene } from "three";
 import { CROP_CONFIG, type CropCategory } from "../config/CropConfig";
-import type { PlantManager } from "../Manager";
-import { placedItemsStore } from "../Manager/PlaceItemStore";
-import { SellPanel } from "../Manager/SellPanelManager";
+import type { PlantManager } from "../manager";
+import { placedItemsStore } from "../manager/PlaceItemStore";
+import { SellPanel } from "../manager/SellPanelManager";
 import type { CameraController } from "../scene/CameraController";
 import type { SelectorState } from "../scene/SelectorFactory";
 import { buildCloseButton } from "./Closebutton";
