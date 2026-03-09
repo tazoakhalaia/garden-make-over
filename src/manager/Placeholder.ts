@@ -38,7 +38,7 @@ export class PlaceHolder {
   }
 
   private async spawnOne(scene: Scene, x: number, y: number, z: number) {
-    const model = await this.loader.load("public/models/objects.glb");
+    const model = await this.loader.load("/models/objects.glb");
     const placeholder = model.children[0];
     placeholder.name = "placeholder";
     placeholder.scale.set(0, 0, 0);

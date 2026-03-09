@@ -8,13 +8,13 @@ type SoundKey =
   | "throw";
 
 const SOUND_SRC: Record<SoundKey, string> = {
-  chicken: "public/sounds/chicken.mp3",
-  cow: "public/sounds/cow.mp3",
-  sheep: "public/sounds/sheep.mp3",
-  click: "public/sounds/click_003.mp3",
-  popup: "public/sounds/popup_chest.mp3",
-  theme: "public/sounds/theme.mp3",
-  throw: "public/sounds/throw_spear.mp3",
+  chicken: "/sounds/chicken.mp3",
+  cow: "/sounds/cow.mp3",
+  sheep: "/sounds/sheep.mp3",
+  click: "/sounds/click_003.mp3",
+  popup: "/sounds/popup_chest.mp3",
+  theme: "/sounds/theme.mp3",
+  throw: "/sounds/throw_spear.mp3",
 };
 
 class SoundManager {

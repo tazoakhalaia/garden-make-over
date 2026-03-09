@@ -1,24 +1,24 @@
 import { Assets, Texture } from "pixi.js";
 
 const IMAGE_MANIFEST = {
-  corn: "public/images/corn.png",
-  grape: "public/images/grape.png",
-  strawberry: "public/images/strawberry.png",
-  tomato: "public/images/tomato.png",
-  chicken: "public/images/chicken.png",
-  sheep: "public/images/sheep.png",
-  cow: "public/images/cow.png",
-  coin: "public/images/money.png",
+  corn: "/images/corn.png",
+  grape: "/images/grape.png",
+  strawberry: "/images/strawberry.png",
+  tomato: "/images/tomato.png",
+  chicken: "/images/chicken.png",
+  sheep: "/images/sheep.png",
+  cow: "/images/cow.png",
+  coin: "/images/money.png",
 } as const;
 
 const SOUND_MANIFEST = {
-  sound_chicken: "public/sounds/chicken.mp3",
-  sound_cow: "public/sounds/cow.mp3",
-  sound_sheep: "public/sounds/sheep.mp3",
-  sound_click: "public/sounds/click_003.mp3",
-  sound_popup: "public/sounds/popup_chest.mp3",
-  sound_theme: "public/sounds/theme.mp3",
-  sound_throw: "public/sounds/throw_spear.mp3",
+  sound_chicken: "/sounds/chicken.mp3",
+  sound_cow: "/sounds/cow.mp3",
+  sound_sheep: "/sounds/sheep.mp3",
+  sound_click: "/sounds/click_003.mp3",
+  sound_popup: "/sounds/popup_chest.mp3",
+  sound_theme: "/sounds/theme.mp3",
+  sound_throw: "/sounds/throw_spear.mp3",
 } as const;
 
 export type AssetKey = keyof typeof IMAGE_MANIFEST;
