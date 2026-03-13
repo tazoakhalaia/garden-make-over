@@ -1,10 +1,20 @@
-import { BoxGeometry, Mesh, MeshStandardMaterial, Scene } from "three";
+import {
+  Mesh,
+  MeshStandardMaterial,
+  PlaneGeometry,
+  Scene
+} from "three";
 
 export class Ground {
   init(scene: Scene) {
-    const box = new BoxGeometry(20, 20);
-    const boxColor = new MeshStandardMaterial({ color: "red" });
-    const mesh = new Mesh(box, boxColor);
-    scene.add(mesh);
+    this.createPlane(scene);
+  }
+
+  createPlane(scene: Scene) {
+    const plane = new PlaneGeometry(20, 20);
+    const planeColor = new MeshStandardMaterial({ color: "green" });
+    const planeMesh = new Mesh(plane, planeColor);
+    planeMesh.rotation.x = -Math.PI / 2;
+    scene.add(planeMesh);
   }
 }

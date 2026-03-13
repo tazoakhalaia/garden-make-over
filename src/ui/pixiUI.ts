@@ -1,4 +1,4 @@
-import { Application, Assets, Sprite } from "pixi.js";
+import { Application, Assets } from "pixi.js";
 import { config } from "../config";
 
 export class PixiUI {
@@ -17,5 +17,10 @@ export class PixiUI {
         backgroundAlpha: 0,
       });
     });
+    window.addEventListener("resize", () => this.onResize());
   }
+
+  onResize = () => {
+    this.app.renderer.resize(window.innerWidth, window.innerHeight);
+  };
 }
