@@ -5,57 +5,63 @@ import {
   Scene,
   WebGLRenderer,
 } from "three";
+import { LoadModels } from "../config";
 import { Ground } from "./ground";
 
 export class ThreeScene {
   private ground = new Ground();
+  private loadAllModels = new LoadModels();
 
-  public _scene!: Scene;
-  private _perspectiveCamera!: PerspectiveCamera;
-  public _renderer!: WebGLRenderer;
+  public scene!: Scene;
+  private perspectiveCamera!: PerspectiveCamera;
+  public renderer!: WebGLRenderer;
 
-  initThree(canvas: HTMLCanvasElement) {
-    this._scene = new Scene();
-    this._perspectiveCamera = new PerspectiveCamera(
+  async initThree(canvas: HTMLCanvasElement): Promise<void> {
+    this.scene = new Scene();
+    this.perspectiveCamera = new PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
       0.01,
       1000,
     );
-    this._perspectiveCamera.position.set(0, 5, 15);
-    this._perspectiveCamera.lookAt(0, 0, 0);
+    this.perspectiveCamera.position.set(0, 20, 25);
+    this.perspectiveCamera.lookAt(0, 0, 0);
 
-    this._renderer = new WebGLRenderer({ canvas, antialias: true });
-    this._renderer.setClearColor("cyan");
-    this._renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer = new WebGLRenderer({ canvas, antialias: true });
+    this.renderer.setClearColor("cyan");
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+    await this.loadAllModels.loadAll();
 
     this.initLights();
-    this.ground.init(this._scene);
     this.animate();
     this.onResize();
     window.addEventListener("resize", () => this.onResize());
+
+    const groundModel = this.loadAllModels.getModel("ground");
+    this.ground.init(this.scene, groundModel);
   }
 
   onResize() {
     const windowWidth = window.innerWidth;
     const windoHeight = window.innerHeight;
-    this._perspectiveCamera.updateProjectionMatrix();
-    this._renderer.setSize(windowWidth, windoHeight);
-    this._renderer.setPixelRatio(window.devicePixelRatio);
+    this.perspectiveCamera.updateProjectionMatrix();
+    this.renderer.setSize(windowWidth, windoHeight);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
   }
 
   private initLights() {
     const ambientLight = new AmbientLight(0xffffff, 0.5);
 
-    const directionalLight = new DirectionalLight("0xffffff", 1);
+    const directionalLight = new DirectionalLight(0xffffff, 1);
     directionalLight.position.set(10, 20, 10);
     directionalLight.castShadow = true;
 
-    this._scene.add(ambientLight, directionalLight);
+    this.scene.add(ambientLight, directionalLight);
   }
 
   animate = () => {
     requestAnimationFrame(this.animate);
-    this._renderer.render(this._scene, this._perspectiveCamera);
+    this.renderer.render(this.scene, this.perspectiveCamera);
   };
 }

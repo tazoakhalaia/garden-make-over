@@ -13,7 +13,7 @@ export class GameController {
     this._threeCanvas = threeCanvas;
   }
 
-  async init() {
+  init() {
     this.pixiUI.initPixi(this._pixiCanvas);
     this.threeScene.initThree(this._threeCanvas);
   }
