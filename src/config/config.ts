@@ -5,5 +5,6 @@ export const config = {
 
   threeModels: {
     ground: "models/ground.glb",
+    farmHouse: "models/farmHouse.glb",
   },
 };

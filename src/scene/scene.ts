@@ -7,10 +7,12 @@ import {
 } from "three";
 import { LoadModels } from "../config";
 import { Ground } from "./ground";
+import { StaticModels } from "./staticModels";
 
 export class ThreeScene {
   private ground = new Ground();
   private loadAllModels = new LoadModels();
+  private statiModels = new StaticModels();
 
   public scene!: Scene;
   private perspectiveCamera!: PerspectiveCamera;
@@ -24,22 +26,22 @@ export class ThreeScene {
       0.01,
       1000,
     );
-    this.perspectiveCamera.position.set(0, 20, 25);
+    this.perspectiveCamera.position.set(0, 10, 15);
     this.perspectiveCamera.lookAt(0, 0, 0);
 
     this.renderer = new WebGLRenderer({ canvas, antialias: true });
     this.renderer.setClearColor("cyan");
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
-    await this.loadAllModels.loadAll();
+    await this.loadAllModels.loadAll().then(() => {
+      this.initLights();
+      this.animate();
+      this.onResize();
+      window.addEventListener("resize", () => this.onResize());
 
-    this.initLights();
-    this.animate();
-    this.onResize();
-    window.addEventListener("resize", () => this.onResize());
-
-    const groundModel = this.loadAllModels.getModel("ground");
-    this.ground.init(this.scene, groundModel);
+      this.ground.init(this.scene, this.loadAllModels);
+      this.statiModels.init(this.scene, this.loadAllModels);
+    });
   }
 
   onResize() {
