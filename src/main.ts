@@ -1,8 +1,8 @@
-import { SceneManager } from "./scene";
+import { GameController } from "./controller";
 import "./style.css";
 
 class App {
-  private sceneManager: SceneManager;
+  private gameController: GameController;
   private threeCanvas = document.getElementById(
     "three-canvas",
   )! as HTMLCanvasElement;
@@ -11,7 +11,8 @@ class App {
   )! as HTMLCanvasElement;
 
   constructor() {
-    this.sceneManager = new SceneManager(this.threeCanvas, this.pixiCanvas);
+    this.gameController = new GameController(this.pixiCanvas, this.threeCanvas);
+    this.gameController.init();
   }
 }
 const app = new App();
