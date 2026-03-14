@@ -1,6 +1,7 @@
 import { Container } from "pixi.js";
 import { Raycaster, Vector2, type PerspectiveCamera, type Scene } from "three";
 import type { AnimalFence, Placeholder } from "../scene";
+import type { Plant } from "../scene/plant";
 import type { PixiUI } from "../ui";
 
 export class ClickHandler {
@@ -16,6 +17,7 @@ export class ClickHandler {
     uiLayer: Container,
     placeholder: Placeholder,
     animalFence: AnimalFence,
+    plant: Plant,
     pixiUI: PixiUI,
   ) {
     pixiCanvas.addEventListener("pointerup", (e) => {
@@ -36,7 +38,13 @@ export class ClickHandler {
 
           switch (id) {
             case "PLANT":
-              console.log("plant");
+              if (this.storeCordinates)
+                plant.placePlantAt(
+                  this.storeCordinates.x,
+                  this.storeCordinates.y,
+                  this.storeCordinates.z,
+                );
+              pixiUI.hideMarket();
               break;
             case "ANIMAL":
               if (this.storeCordinates)

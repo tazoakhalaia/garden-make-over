@@ -9,12 +9,14 @@ import { LoadModels } from "../config";
 import { AnimalFence } from "./animalFence";
 import { Ground } from "./ground";
 import { Placeholder } from "./placeholder";
+import { Plant } from "./plant";
 
 export class ThreeScene {
   private ground = new Ground();
   private loadAllModels = new LoadModels();
   public placeholder = new Placeholder();
   public animalFence = new AnimalFence();
+  public plant = new Plant();
 
   public scene!: Scene;
   public perspectiveCamera!: PerspectiveCamera;
@@ -45,6 +47,7 @@ export class ThreeScene {
       this.ground.init(this.scene, this.loadAllModels);
       this.placeholder.createPlaceholder(this.scene, this.loadAllModels);
       this.animalFence.createFence(this.scene, this.loadAllModels);
+      this.plant.createPlant(this.scene, this.loadAllModels);
     });
   }
 
