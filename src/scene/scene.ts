@@ -31,6 +31,7 @@ export class ThreeScene {
 
     this.renderer = new WebGLRenderer({ canvas, antialias: true });
     this.renderer.setClearColor("cyan");
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
     await this.loadAllModels.loadAll().then(() => {
@@ -45,11 +46,14 @@ export class ThreeScene {
   }
 
   onResize() {
-    const windowWidth = window.innerWidth;
-    const windoHeight = window.innerHeight;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    this.perspectiveCamera.aspect = width / height;
     this.perspectiveCamera.updateProjectionMatrix();
-    this.renderer.setSize(windowWidth, windoHeight);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
+
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setSize(width, height);
   }
 
   private initLights() {
