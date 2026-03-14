@@ -6,12 +6,14 @@ import {
   WebGLRenderer,
 } from "three";
 import { LoadModels } from "../config";
+import { Farmer } from "./farmer";
 import { Ground } from "./ground";
 import { StaticModels } from "./staticModels";
 
 export class ThreeScene {
   private ground = new Ground();
   private loadAllModels = new LoadModels();
+  private farmer = new Farmer();
   private statiModels = new StaticModels();
 
   public scene!: Scene;
@@ -26,7 +28,7 @@ export class ThreeScene {
       0.01,
       1000,
     );
-    this.perspectiveCamera.position.set(0, 10, 15);
+    this.perspectiveCamera.position.set(0, 200, 80);
     this.perspectiveCamera.lookAt(0, 0, 0);
 
     this.renderer = new WebGLRenderer({ canvas, antialias: true });
@@ -40,6 +42,7 @@ export class ThreeScene {
       window.addEventListener("resize", () => this.onResize());
 
       this.ground.init(this.scene, this.loadAllModels);
+      this.farmer.init(this.scene, this.loadAllModels);
       this.statiModels.init(this.scene, this.loadAllModels);
     });
   }
@@ -55,7 +58,7 @@ export class ThreeScene {
   private initLights() {
     const ambientLight = new AmbientLight(0xffffff, 0.5);
 
-    const directionalLight = new DirectionalLight(0xffffff, 1);
+    const directionalLight = new DirectionalLight(0xffffff, 4);
     directionalLight.position.set(10, 20, 10);
     directionalLight.castShadow = true;
 
@@ -64,6 +67,7 @@ export class ThreeScene {
 
   animate = () => {
     requestAnimationFrame(this.animate);
+    this.farmer.update();
     this.renderer.render(this.scene, this.perspectiveCamera);
   };
 }
