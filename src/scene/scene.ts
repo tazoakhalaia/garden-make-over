@@ -17,7 +17,7 @@ export class ThreeScene {
   private statiModels = new StaticModels();
 
   public scene!: Scene;
-  private perspectiveCamera!: PerspectiveCamera;
+  public perspectiveCamera!: PerspectiveCamera;
   public renderer!: WebGLRenderer;
 
   async initThree(canvas: HTMLCanvasElement): Promise<void> {
