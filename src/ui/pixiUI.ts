@@ -1,18 +1,20 @@
 import { Application, Assets, Container } from "pixi.js";
 import { config } from "../config";
 import { DayNightToggler } from "./dayNightToggler";
+import { MarketBubble } from "./marketBubble";
 
 export class PixiUI {
   private app = new Application();
   public uiLayer = new Container();
 
   private dayNightToggler = new DayNightToggler();
+  private marketBubble = new MarketBubble();
 
   constructor() {
     Assets.addBundle("Assets", config.pixiAssets);
   }
 
-  async initPixi(canvas: HTMLCanvasElement) {
+  initPixi(canvas: HTMLCanvasElement) {
     Assets.loadBundle(["Assets"], async () => {
       await this.app.init({
         canvas,
@@ -26,6 +28,7 @@ export class PixiUI {
       this.app.stage.addChild(this.uiLayer);
     });
 
+    this.marketBubble.createBubble(this.uiLayer);
     window.addEventListener("resize", () => this.onResize());
   }
 

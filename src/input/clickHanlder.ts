@@ -14,7 +14,7 @@ export class ClickHandler {
     placeholder: Placeholder,
     animalFence: AnimalFence,
   ) {
-    pixiCanvas.addEventListener("pointerdown", (e) => {
+    pixiCanvas.addEventListener("pointerup", (e) => {
       let pixiHit = false;
 
       uiLayer.children.forEach((child) => {
