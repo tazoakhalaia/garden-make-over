@@ -6,6 +6,7 @@ import {
   WebGLRenderer,
 } from "three";
 import { LoadModels } from "../config";
+import { AnimalFence } from "./animalFence";
 import { Ground } from "./ground";
 import { Placeholder } from "./placeholder";
 
@@ -13,6 +14,7 @@ export class ThreeScene {
   private ground = new Ground();
   private loadAllModels = new LoadModels();
   public placeholder = new Placeholder();
+  public animalFence = new AnimalFence();
 
   public scene!: Scene;
   public perspectiveCamera!: PerspectiveCamera;
@@ -42,6 +44,7 @@ export class ThreeScene {
 
       this.ground.init(this.scene, this.loadAllModels);
       this.placeholder.createPlaceholder(this.scene, this.loadAllModels);
+      this.animalFence.createFence(this.scene, this.loadAllModels);
     });
   }
 

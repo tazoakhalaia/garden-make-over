@@ -1,6 +1,6 @@
 import { Container } from "pixi.js";
 import { Raycaster, Vector2, type PerspectiveCamera, type Scene } from "three";
-import type { Placeholder } from "../scene";
+import type { AnimalFence, Placeholder } from "../scene";
 
 export class ClickHandler {
   private raycaster = new Raycaster();
@@ -12,6 +12,7 @@ export class ClickHandler {
     scene: Scene,
     uiLayer: Container,
     placeholder: Placeholder,
+    animalFence: AnimalFence,
   ) {
     pixiCanvas.addEventListener("pointerdown", (e) => {
       let pixiHit = false;
@@ -42,9 +43,16 @@ export class ClickHandler {
 
       if (intersects.length > 0) {
         const hit = intersects[0].object;
+
+        //Placeholder
         const isPlaceholder = placeholder.getPlaceholders().includes(hit);
         if (isPlaceholder) {
           placeholder.removePlaceholder(hit);
+          animalFence.placeFenceAt(
+            hit.position.x,
+            hit.position.y,
+            hit.position.z,
+          );
         }
       }
     });

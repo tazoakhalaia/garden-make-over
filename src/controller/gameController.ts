@@ -24,6 +24,7 @@ export class GameController {
       this.threeScene.scene,
       this.pixiUI.uiLayer,
       this.threeScene.placeholder,
+      this.threeScene.animalFence,
     );
   }
 }
