@@ -6,14 +6,12 @@ import {
   WebGLRenderer,
 } from "three";
 import { LoadModels } from "../config";
-import { Farmer } from "./farmer";
 import { Ground } from "./ground";
 import { StaticModels } from "./staticModels";
 
 export class ThreeScene {
   private ground = new Ground();
   private loadAllModels = new LoadModels();
-  private farmer = new Farmer();
   private statiModels = new StaticModels();
 
   public scene!: Scene;
@@ -42,7 +40,6 @@ export class ThreeScene {
       window.addEventListener("resize", () => this.onResize());
 
       this.ground.init(this.scene, this.loadAllModels);
-      this.farmer.init(this.scene, this.loadAllModels);
       this.statiModels.init(this.scene, this.loadAllModels);
     });
   }
@@ -67,7 +64,6 @@ export class ThreeScene {
 
   animate = () => {
     requestAnimationFrame(this.animate);
-    this.farmer.update();
     this.renderer.render(this.scene, this.perspectiveCamera);
   };
 }
