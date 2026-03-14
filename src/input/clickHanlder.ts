@@ -1,10 +1,13 @@
 import { Container } from "pixi.js";
 import { Raycaster, Vector2, type PerspectiveCamera, type Scene } from "three";
 import type { AnimalFence, Placeholder } from "../scene";
+import type { PixiUI } from "../ui";
 
 export class ClickHandler {
   private raycaster = new Raycaster();
   private mouse = new Vector2();
+
+  private storeCordinates: { x: number; y: number; z: number } | null = null;
 
   public setupClickHandler(
     pixiCanvas: HTMLCanvasElement,
@@ -13,12 +16,14 @@ export class ClickHandler {
     uiLayer: Container,
     placeholder: Placeholder,
     animalFence: AnimalFence,
+    pixiUI: PixiUI,
   ) {
     pixiCanvas.addEventListener("pointerup", (e) => {
       let pixiHit = false;
 
       uiLayer.children.forEach((child) => {
         const bounds = (child as Container).getBounds();
+
         const hit =
           e.clientX >= bounds.x &&
           e.clientX <= bounds.x + bounds.width &&
@@ -28,6 +33,21 @@ export class ClickHandler {
         if (hit) {
           pixiHit = true;
           const id = (child as Container).label;
+
+          switch (id) {
+            case "PLANT":
+              console.log("plant");
+              break;
+            case "ANIMAL":
+              if (this.storeCordinates)
+                animalFence.placeFenceAt(
+                  this.storeCordinates.x,
+                  this.storeCordinates.y,
+                  this.storeCordinates.z,
+                );
+              pixiUI.hideMarket();
+              break;
+          }
         }
       });
 
@@ -48,7 +68,12 @@ export class ClickHandler {
         if (isPlaceholder) {
           const worldPos = hit.parent!.position;
           placeholder.removePlaceholder(hit);
-          animalFence.placeFenceAt(worldPos.x, worldPos.y, worldPos.z);
+          pixiUI.showMarket();
+          this.storeCordinates = {
+            x: worldPos.x,
+            y: worldPos.y,
+            z: worldPos.z,
+          };
         }
       }
     });
