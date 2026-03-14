@@ -5,7 +5,6 @@ export const config = {
 
   threeModels: {
     ground: "models/ground.glb",
-    farmer: "models/farmer.glb",
     farmObjects: "models/objects2.glb",
   },
 
