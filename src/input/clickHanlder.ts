@@ -72,6 +72,7 @@ export class ClickHandler {
       if (intersects.length > 0) {
         const hit = intersects[0].object;
 
+        //Placceholder
         const isPlaceholder = placeholder.getPlaceholders().includes(hit);
         if (isPlaceholder) {
           const worldPos = hit.parent!.position;
@@ -83,6 +84,11 @@ export class ClickHandler {
             z: worldPos.z,
           };
         }
+
+        //AnimalFence
+        const clickedFence = animalFence
+          .getFence()
+          .find((fence) => fence === hit || fence === hit.parent);
       }
     });
   }
