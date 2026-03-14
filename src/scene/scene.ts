@@ -7,12 +7,12 @@ import {
 } from "three";
 import { LoadModels } from "../config";
 import { Ground } from "./ground";
-import { StaticModels } from "./staticModels";
+import { Placeholder } from "./placeholder";
 
 export class ThreeScene {
   private ground = new Ground();
   private loadAllModels = new LoadModels();
-  private statiModels = new StaticModels();
+  public placeholder = new Placeholder();
 
   public scene!: Scene;
   public perspectiveCamera!: PerspectiveCamera;
@@ -41,7 +41,7 @@ export class ThreeScene {
       window.addEventListener("resize", () => this.onResize());
 
       this.ground.init(this.scene, this.loadAllModels);
-      this.statiModels.init(this.scene, this.loadAllModels);
+      this.placeholder.createPlaceholder(this.scene, this.loadAllModels);
     });
   }
 

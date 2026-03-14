@@ -23,6 +23,7 @@ export class GameController {
       this.threeScene.perspectiveCamera,
       this.threeScene.scene,
       this.pixiUI.uiLayer,
+      this.threeScene.placeholder,
     );
   }
 }
