@@ -44,15 +44,11 @@ export class ClickHandler {
       if (intersects.length > 0) {
         const hit = intersects[0].object;
 
-        //Placeholder
         const isPlaceholder = placeholder.getPlaceholders().includes(hit);
         if (isPlaceholder) {
+          const worldPos = hit.parent!.position;
           placeholder.removePlaceholder(hit);
-          animalFence.placeFenceAt(
-            hit.position.x,
-            hit.position.y,
-            hit.position.z,
-          );
+          animalFence.placeFenceAt(worldPos.x, worldPos.y, worldPos.z);
         }
       }
     });
