@@ -3,12 +3,14 @@ import { PerspectiveCamera, Raycaster, Vector2, type Scene } from "three";
 import type { GameEvents } from "../config/gameEvents";
 import { plantOrAnimal } from "../enums";
 import type { AnimalFence, Placeholder } from "../scene";
+import type { Plant } from "../scene/plant";
 
 export class ClickHandler {
   private raycaster = new Raycaster();
   private mouse = new Vector2();
   private pendingCoords: { x: number; y: number; z: number } | null = null;
   private animalCords: { x: number; y: number; z: number } | null = null;
+  private plantCords: { x: number; y: number; z: number } | null = null;
 
   private checkClickEvent(
     container: Container,
@@ -41,6 +43,7 @@ export class ClickHandler {
     uiLayer: Container,
     placeholder: Placeholder,
     animalFence: AnimalFence,
+    plant: Plant,
     gameEvents: GameEvents,
   ) {
     pixiCanvas.addEventListener("pointerup", (e) => {
@@ -62,6 +65,16 @@ export class ClickHandler {
           gameEvents.dispatchEvent({
             type: "animalMarket:item-selected",
             ...this.animalCords,
+          });
+        }
+        return;
+      }
+
+      if (id === plantOrAnimal.PLANTMARKET) {
+        if (this.plantCords) {
+          gameEvents.dispatchEvent({
+            type: "buyPlant:item-selected",
+            ...this.plantCords,
           });
         }
         return;
@@ -96,6 +109,15 @@ export class ClickHandler {
           gameEvents.dispatchEvent({
             type: "fence:clicked",
           });
+          return;
+        }
+
+        const clickedPlant = plant.getHitBoxes().find((box) => box === hit);
+
+        if (clickedPlant) {
+          const { x, y, z } = intersects[0].point;
+          this.plantCords = { x, y, z };
+          gameEvents.dispatchEvent({ type: "plantGround:clicked" });
           return;
         }
       }

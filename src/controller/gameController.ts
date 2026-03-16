@@ -27,6 +27,7 @@ export class GameController {
       this.pixiUI.uiLayer,
       this.threeScene.placeholder,
       this.threeScene.animalFence,
+      this.threeScene.plant,
       this.gameEvents,
     );
 
@@ -54,5 +55,17 @@ export class GameController {
     this.gameEvents.addEventListener("fence:clicked", () => {
       this.pixiUI.showAnimalMarket();
     });
+
+    this.gameEvents.addEventListener("plantGround:clicked", () => {
+      this.pixiUI.showPlantMarket();
+    });
+
+    this.gameEvents.addEventListener(
+      "buyPlant:item-selected",
+      ({ x, y, z }) => {
+        this.threeScene.spawner.spawnObjects(x, y, z);
+        this.pixiUI.hidePlantMarket();
+      },
+    );
   }
 }

@@ -25,11 +25,24 @@ type AnimaMarketClickedEvent = {
   z: number;
 };
 
+type PlantGroundClickedEvent = {
+  type: "plantGround:clicked";
+};
+
+type PlantMarketChooseEvent = {
+  type: "buyPlant:item-selected";
+  x: number;
+  y: number;
+  z: number;
+};
+
 export type GameEventMap = {
   "placeholder:clicked": PlaceholderClickedEvent;
   "market:item-selected": MarketItemSelectedEvent;
   "fence:clicked": FenceClickedEvent;
   "animalMarket:item-selected": AnimaMarketClickedEvent;
+  "plantGround:clicked": PlantGroundClickedEvent;
+  "buyPlant:item-selected": PlantMarketChooseEvent;
 };
 
 export class GameEvents extends EventDispatcher<GameEventMap> {}
