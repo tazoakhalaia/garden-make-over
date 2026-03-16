@@ -13,4 +13,9 @@ export const config = {
     { x: -70, y: 25, z: 20 },
     { x: 40, y: 25, z: 20 },
   ],
+
+  baseScreenSize: {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  },
 };

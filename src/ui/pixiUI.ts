@@ -1,36 +1,36 @@
 import { Application, Assets, Container } from "pixi.js";
 import { config } from "../config";
-import { DayNightToggler } from "./dayNightToggler";
 import { PlantOrAnimalMarket } from "./plantOrAnimalMarket";
-import { SellProductsBubble } from "./sellProductsBubble";
 
 export class PixiUI {
   private app = new Application();
   public uiLayer = new Container();
 
-  private dayNightToggler = new DayNightToggler();
-  private sellProductsBubble = new SellProductsBubble();
   public plantOrAnimalMarket = new PlantOrAnimalMarket();
+
+  private screenSize = config.baseScreenSize;
 
   constructor() {
     Assets.addBundle("Assets", config.pixiAssets);
   }
 
-  initPixi(canvas: HTMLCanvasElement) {
-    Assets.loadBundle(["Assets"], async () => {
-      await this.app.init({
-        canvas,
-        width: window.innerWidth,
-        height: window.innerHeight,
-        backgroundAlpha: 0,
-      });
+  async initPixi(canvas: HTMLCanvasElement) {
+    await Assets.loadBundle(["Assets"]);
 
-      this.uiLayer.interactive = true;
-      this.uiLayer.interactiveChildren = true;
-      this.app.stage.addChild(this.uiLayer);
+    await this.app.init({
+      canvas,
+      width: this.screenSize.width,
+      height: this.screenSize.height,
+      backgroundAlpha: 0,
     });
 
-    window.addEventListener("resize", () => this.onResize());
+    this.uiLayer.eventMode = "static";
+    this.uiLayer.interactiveChildren = true;
+
+    this.app.stage.addChild(this.uiLayer);
+
+    this.onResize();
+    window.addEventListener("resize", this.onResize);
   }
 
   showMarket() {
@@ -42,6 +42,16 @@ export class PixiUI {
   }
 
   onResize = () => {
-    this.app.renderer.resize(window.innerWidth, window.innerHeight);
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    this.app.renderer.resize(width, height);
+
+    const scaleX = width / this.screenSize.width;
+    const scaleY = height / this.screenSize.height;
+
+    const scale = Math.min(scaleX, scaleY);
+
+    this.app.stage.scale.set(scale);
   };
 }
