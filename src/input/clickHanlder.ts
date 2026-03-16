@@ -9,13 +9,16 @@ export class ClickHandler {
   private mouse = new Vector2();
   private pendingCoords: { x: number; y: number; z: number } | null = null;
 
-  private hitTest(container: Container, e: PointerEvent): string | null {
-    const validLabels = Object.values(plantOrAnimal);
+  private checkClickEvent(
+    container: Container,
+    e: PointerEvent,
+  ): string | null {
+    const validLabels = [...Object.values(plantOrAnimal), "BACKGROUND"];
 
-    for (const child of container.children) {
-      const c = child as Container;
+    for (let i = container.children.length - 1; i >= 0; i--) {
+      const c = container.children[i] as Container;
 
-      const found = this.hitTest(c, e);
+      const found = this.checkClickEvent(c, e);
       if (found) return found;
 
       const bounds = c.getBounds();
@@ -25,7 +28,7 @@ export class ClickHandler {
         e.clientY >= bounds.y &&
         e.clientY <= bounds.y + bounds.height;
 
-      if (hit && validLabels.includes(c.label as plantOrAnimal)) return c.label;
+      if (hit && validLabels.includes(c.label)) return c.label;
     }
     return null;
   }
@@ -39,8 +42,8 @@ export class ClickHandler {
     gameEvents: GameEvents,
   ) {
     pixiCanvas.addEventListener("pointerup", (e) => {
-      const id = this.hitTest(uiLayer, e);
-
+      const id = this.checkClickEvent(uiLayer, e);
+      if (id === "BACKGROUND") return;
       if (id === "PLANT" || id === "ANIMAL") {
         if (this.pendingCoords) {
           gameEvents.dispatchEvent({

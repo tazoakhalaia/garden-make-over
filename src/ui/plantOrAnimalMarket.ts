@@ -17,6 +17,7 @@ export class PlantOrAnimalMarket {
       .rect(0, 0, window.innerWidth, window.innerHeight)
       .fill({ color: "grey" });
     this.marketBackground.alpha = 0.2;
+    this.marketBackground.label = "BACKGROUND";
     container.addChild(this.marketBackground);
   }
 
