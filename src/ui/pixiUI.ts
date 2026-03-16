@@ -1,5 +1,6 @@
 import { Application, Assets, Container } from "pixi.js";
 import { config } from "../config";
+import { AnimalMarket } from "./animalMarket";
 import { PlantOrAnimalMarket } from "./plantOrAnimalMarket";
 
 export class PixiUI {
@@ -7,6 +8,7 @@ export class PixiUI {
   public uiLayer = new Container();
 
   public plantOrAnimalMarket = new PlantOrAnimalMarket();
+  public animalMarket = new AnimalMarket();
 
   private screenSize = config.baseScreenSize;
 
@@ -39,6 +41,14 @@ export class PixiUI {
 
   hideMarket() {
     this.plantOrAnimalMarket.destroy();
+  }
+
+  showAnimalMarket() {
+    this.animalMarket.createAnimalMarket(this.uiLayer);
+  }
+
+  hideAnimalMarket() {
+    this.animalMarket.destroy();
   }
 
   onResize = () => {

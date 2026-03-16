@@ -43,8 +43,16 @@ export class GameController {
       },
     );
 
-    this.gameEvents.addEventListener("fence:clicked", ({ x, y, z }) => {
-      this.threeScene.spawner.spawnObjects(x, y, z);
+    this.gameEvents.addEventListener(
+      "animalMarket:item-selected",
+      ({ x, y, z }) => {
+        this.threeScene.spawner.spawnObjects(x, y, z);
+        this.pixiUI.hideAnimalMarket();
+      },
+    );
+
+    this.gameEvents.addEventListener("fence:clicked", () => {
+      this.pixiUI.showAnimalMarket();
     });
   }
 }

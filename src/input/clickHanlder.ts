@@ -1,5 +1,5 @@
 import { Container } from "pixi.js";
-import { Raycaster, Vector2, type PerspectiveCamera, type Scene } from "three";
+import { PerspectiveCamera, Raycaster, Vector2, type Scene } from "three";
 import type { GameEvents } from "../config/gameEvents";
 import { plantOrAnimal } from "../enums";
 import type { AnimalFence, Placeholder } from "../scene";
@@ -8,6 +8,7 @@ export class ClickHandler {
   private raycaster = new Raycaster();
   private mouse = new Vector2();
   private pendingCoords: { x: number; y: number; z: number } | null = null;
+  private animalCords: { x: number; y: number; z: number } | null = null;
 
   private checkClickEvent(
     container: Container,
@@ -44,13 +45,23 @@ export class ClickHandler {
   ) {
     pixiCanvas.addEventListener("pointerup", (e) => {
       const id = this.checkClickEvent(uiLayer, e);
-      if (id === "BACKGROUND") return;
-      if (id === "PLANT" || id === "ANIMAL") {
+      if (id === plantOrAnimal.BACKGROUND) return;
+      if (id === plantOrAnimal.PLANT || id === plantOrAnimal.ANIMAL) {
         if (this.pendingCoords) {
           gameEvents.dispatchEvent({
             type: "market:item-selected",
             id,
             ...this.pendingCoords,
+          });
+        }
+        return;
+      }
+
+      if (id === plantOrAnimal.ANIMALMARKET) {
+        if (this.animalCords) {
+          gameEvents.dispatchEvent({
+            type: "animalMarket:item-selected",
+            ...this.animalCords,
           });
         }
         return;
@@ -80,12 +91,10 @@ export class ClickHandler {
           .findIndex((box) => box === hit);
 
         if (clickedFenceIndex !== -1) {
-          const point = intersects[0].point;
+          const { x, y, z } = intersects[0].point;
+          this.animalCords = { x, y, z };
           gameEvents.dispatchEvent({
             type: "fence:clicked",
-            x: point.x,
-            y: point.y,
-            z: point.z,
           });
           return;
         }
