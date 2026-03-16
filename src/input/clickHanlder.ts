@@ -1,14 +1,34 @@
 import { Container } from "pixi.js";
 import { Raycaster, Vector2, type PerspectiveCamera, type Scene } from "three";
-import type { AnimalFence, Placeholder } from "../scene";
-import type { Plant } from "../scene/plant";
-import type { PixiUI } from "../ui";
+import type { GameEvents } from "../config/gameEvents";
+import { plantOrAnimal } from "../enums";
+import type { Placeholder } from "../scene";
 
 export class ClickHandler {
   private raycaster = new Raycaster();
   private mouse = new Vector2();
+  private pendingCoords: { x: number; y: number; z: number } | null = null;
 
-  private storeCordinates: { x: number; y: number; z: number } | null = null;
+  private hitTest(container: Container, e: PointerEvent): string | null {
+    const validLabels = Object.values(plantOrAnimal);
+
+    for (const child of container.children) {
+      const c = child as Container;
+
+      const found = this.hitTest(c, e);
+      if (found) return found;
+
+      const bounds = c.getBounds();
+      const hit =
+        e.clientX >= bounds.x &&
+        e.clientX <= bounds.x + bounds.width &&
+        e.clientY >= bounds.y &&
+        e.clientY <= bounds.y + bounds.height;
+
+      if (hit && validLabels.includes(c.label as plantOrAnimal)) return c.label;
+    }
+    return null;
+  }
 
   public setupClickHandler(
     pixiCanvas: HTMLCanvasElement,
@@ -16,50 +36,21 @@ export class ClickHandler {
     scene: Scene,
     uiLayer: Container,
     placeholder: Placeholder,
-    animalFence: AnimalFence,
-    plant: Plant,
-    pixiUI: PixiUI,
+    gameEvents: GameEvents,
   ) {
     pixiCanvas.addEventListener("pointerup", (e) => {
-      let pixiHit = false;
+      const id = this.hitTest(uiLayer, e);
 
-      uiLayer.children.forEach((child) => {
-        const bounds = (child as Container).getBounds();
-
-        const hit =
-          e.clientX >= bounds.x &&
-          e.clientX <= bounds.x + bounds.width &&
-          e.clientY >= bounds.y &&
-          e.clientY <= bounds.y + bounds.height;
-
-        if (hit) {
-          pixiHit = true;
-          const id = (child as Container).label;
-
-          switch (id) {
-            case "PLANT":
-              if (this.storeCordinates)
-                plant.placePlantAt(
-                  this.storeCordinates.x,
-                  this.storeCordinates.y,
-                  this.storeCordinates.z,
-                );
-              pixiUI.hideMarket();
-              break;
-            case "ANIMAL":
-              if (this.storeCordinates)
-                animalFence.placeFenceAt(
-                  this.storeCordinates.x,
-                  this.storeCordinates.y,
-                  this.storeCordinates.z,
-                );
-              pixiUI.hideMarket();
-              break;
-          }
+      if (id === "PLANT" || id === "ANIMAL") {
+        if (this.pendingCoords) {
+          gameEvents.dispatchEvent({
+            type: "market:item-selected",
+            id,
+            ...this.pendingCoords,
+          });
         }
-      });
-
-      if (pixiHit) return;
+        return;
+      }
 
       this.mouse.set(
         (e.clientX / window.innerWidth) * 2 - 1,
@@ -72,23 +63,13 @@ export class ClickHandler {
       if (intersects.length > 0) {
         const hit = intersects[0].object;
 
-        //Placceholder
         const isPlaceholder = placeholder.getPlaceholders().includes(hit);
         if (isPlaceholder) {
-          const worldPos = hit.parent!.position;
+          const { x, y, z } = hit.parent!.position;
           placeholder.removePlaceholder(hit);
-          pixiUI.showMarket();
-          this.storeCordinates = {
-            x: worldPos.x,
-            y: worldPos.y,
-            z: worldPos.z,
-          };
+          this.pendingCoords = { x, y, z };
+          gameEvents.dispatchEvent({ type: "placeholder:clicked", x, y, z });
         }
-
-        //AnimalFence
-        const clickedFence = animalFence
-          .getFence()
-          .find((fence) => fence === hit || fence === hit.parent);
       }
     });
   }

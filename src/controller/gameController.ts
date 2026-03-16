@@ -1,3 +1,4 @@
+import { GameEvents } from "../config";
 import { ClickHandler } from "../input";
 import { ThreeScene } from "../scene";
 import { PixiUI } from "../ui";
@@ -6,6 +7,7 @@ export class GameController {
   private pixiUI = new PixiUI();
   private threeScene = new ThreeScene();
   private clickHandler = new ClickHandler();
+  private gameEvents = new GameEvents();
 
   private _pixiCanvas: HTMLCanvasElement;
   private _threeCanvas: HTMLCanvasElement;
@@ -24,9 +26,20 @@ export class GameController {
       this.threeScene.scene,
       this.pixiUI.uiLayer,
       this.threeScene.placeholder,
-      this.threeScene.animalFence,
-      this.threeScene.plant,
-      this.pixiUI,
+      this.gameEvents,
+    );
+
+    this.gameEvents.addEventListener("placeholder:clicked", () => {
+      this.pixiUI.showMarket();
+    });
+
+    this.gameEvents.addEventListener(
+      "market:item-selected",
+      ({ id, x, y, z }) => {
+        if (id === "PLANT") this.threeScene.plant.placePlantAt(x, y, z);
+        if (id === "ANIMAL") this.threeScene.animalFence.placeFenceAt(x, y, z);
+        this.pixiUI.hideMarket();
+      },
     );
   }
 }
