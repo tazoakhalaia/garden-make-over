@@ -18,23 +18,23 @@ export class PixiUI {
     Assets.addBundle("Assets", config.pixiAssets);
   }
 
-  async initPixi(canvas: HTMLCanvasElement) {
-    await Assets.loadBundle(["Assets"]);
+  initPixi(canvas: HTMLCanvasElement) {
+    Assets.loadBundle(["Assets"]).then(async () => {
+      await this.app.init({
+        canvas,
+        width: this.screenSize.width,
+        height: this.screenSize.height,
+        backgroundAlpha: 0,
+      });
 
-    await this.app.init({
-      canvas,
-      width: this.screenSize.width,
-      height: this.screenSize.height,
-      backgroundAlpha: 0,
+      this.uiLayer.eventMode = "static";
+      this.uiLayer.interactiveChildren = true;
+
+      this.app.stage.addChild(this.uiLayer);
+
+      this.onResize();
+      window.addEventListener("resize", this.onResize);
     });
-
-    this.uiLayer.eventMode = "static";
-    this.uiLayer.interactiveChildren = true;
-
-    this.app.stage.addChild(this.uiLayer);
-
-    this.onResize();
-    window.addEventListener("resize", this.onResize);
   }
 
   showMarket() {

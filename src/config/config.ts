@@ -1,5 +1,6 @@
 export const config = {
   pixiAssets: {
+    LuckiestGuy: "fonts/LuckiestGuy-Regular.ttf",
     chicken: "images/chicken.png",
   },
 
