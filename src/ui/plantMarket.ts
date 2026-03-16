@@ -1,6 +1,7 @@
 import { Container, Graphics } from "pixi.js";
 import { plantOrAnimal } from "../enums";
 
+///Example view for click
 export class PlantMarket {
   private marketBackground!: Graphics;
   private plantContainer = new Container();
