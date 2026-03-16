@@ -60,10 +60,15 @@ export class ClickHandler {
         return;
       }
 
-      if (id === plantOrAnimal.ANIMALMARKET) {
+      if (
+        id === plantOrAnimal.COW ||
+        id === plantOrAnimal.CHICKEN ||
+        id === plantOrAnimal.SHEEP
+      ) {
         if (this.animalCords) {
           gameEvents.dispatchEvent({
             type: "animalMarket:item-selected",
+            id,
             ...this.animalCords,
           });
         }

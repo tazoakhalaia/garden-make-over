@@ -20,6 +20,7 @@ type FenceClickedEvent = {
 
 type AnimaMarketClickedEvent = {
   type: "animalMarket:item-selected";
+  id: string;
   x: number;
   y: number;
   z: number;

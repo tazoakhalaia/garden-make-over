@@ -19,7 +19,7 @@ export class PixiUI {
   }
 
   initPixi(canvas: HTMLCanvasElement) {
-    Assets.loadBundle(["Assets"]).then(async () => {
+    Assets.loadBundle(["Assets"]).then(async (e) => {
       await this.app.init({
         canvas,
         width: this.screenSize.width,
