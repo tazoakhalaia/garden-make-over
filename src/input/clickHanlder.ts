@@ -75,12 +75,18 @@ export class ClickHandler {
           gameEvents.dispatchEvent({ type: "placeholder:clicked", x, y, z });
         }
 
-        const clickedFence = animalFence
+        const clickedFenceIndex = animalFence
           .getHitBoxes()
-          .find((box) => box === hit);
+          .findIndex((box) => box === hit);
 
-        if (clickedFence) {
-          gameEvents.dispatchEvent({ type: "fence:clicked" });
+        if (clickedFenceIndex !== -1) {
+          const point = intersects[0].point;
+          gameEvents.dispatchEvent({
+            type: "fence:clicked",
+            x: point.x,
+            y: point.y,
+            z: point.z,
+          });
           return;
         }
       }

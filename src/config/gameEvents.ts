@@ -16,6 +16,9 @@ type MarketItemSelectedEvent = {
 
 type FenceClickedEvent = {
   type: "fence:clicked";
+  x: number;
+  y: number;
+  z: number;
 };
 
 export type GameEventMap = {

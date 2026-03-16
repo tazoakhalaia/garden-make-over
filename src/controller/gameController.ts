@@ -43,8 +43,8 @@ export class GameController {
       },
     );
 
-    this.gameEvents.addEventListener("fence:clicked", () => {
-      console.log("fence clicked!");
+    this.gameEvents.addEventListener("fence:clicked", ({ x, y, z }) => {
+      this.threeScene.spawner.spawnObjects(x, y, z);
     });
   }
 }
