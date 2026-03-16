@@ -26,6 +26,7 @@ export class GameController {
       this.threeScene.scene,
       this.pixiUI.uiLayer,
       this.threeScene.placeholder,
+      this.threeScene.animalFence,
       this.gameEvents,
     );
 
@@ -41,5 +42,9 @@ export class GameController {
         this.pixiUI.hideMarket();
       },
     );
+
+    this.gameEvents.addEventListener("fence:clicked", () => {
+      console.log("fence clicked!");
+    });
   }
 }

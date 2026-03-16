@@ -2,7 +2,7 @@ import { Container } from "pixi.js";
 import { Raycaster, Vector2, type PerspectiveCamera, type Scene } from "three";
 import type { GameEvents } from "../config/gameEvents";
 import { plantOrAnimal } from "../enums";
-import type { Placeholder } from "../scene";
+import type { AnimalFence, Placeholder } from "../scene";
 
 export class ClickHandler {
   private raycaster = new Raycaster();
@@ -39,6 +39,7 @@ export class ClickHandler {
     scene: Scene,
     uiLayer: Container,
     placeholder: Placeholder,
+    animalFence: AnimalFence,
     gameEvents: GameEvents,
   ) {
     pixiCanvas.addEventListener("pointerup", (e) => {
@@ -72,6 +73,15 @@ export class ClickHandler {
           placeholder.removePlaceholder(hit);
           this.pendingCoords = { x, y, z };
           gameEvents.dispatchEvent({ type: "placeholder:clicked", x, y, z });
+        }
+
+        const clickedFence = animalFence
+          .getHitBoxes()
+          .find((box) => box === hit);
+
+        if (clickedFence) {
+          gameEvents.dispatchEvent({ type: "fence:clicked" });
+          return;
         }
       }
     });
