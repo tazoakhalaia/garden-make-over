@@ -29,7 +29,7 @@ export class CameraControls {
     window.addEventListener("mouseup", () => this.onMouseUp());
     window.addEventListener("touchstart", (e) => this.onTouchStart(e));
     window.addEventListener("touchmove", (e) => this.onTouchMove(e));
-    window.addEventListener("touchend", () => this.onMouseUp());
+    window.addEventListener("touchend", () => this.onTouchEnd());
   }
 
   private move(deltaX: number, deltaY: number) {
@@ -68,6 +68,7 @@ export class CameraControls {
     if (!this.enabled) return;
     const touch = e.touches[0];
     this.isDragging = true;
+    this.hasDragged = false;
     this.lastX = touch.clientX;
     this.lastY = touch.clientY;
   }
@@ -75,10 +76,26 @@ export class CameraControls {
   private onTouchMove(e: TouchEvent) {
     if (!this.isDragging) return;
     const touch = e.touches[0];
+    this.hasDragged = true;
     this.move(touch.clientX - this.lastX, touch.clientY - this.lastY);
     this.lastX = touch.clientX;
     this.lastY = touch.clientY;
   }
+
+  private onTouchEnd() {
+    if (this.hasDragged) {
+      window.addEventListener("click", this.suppressClick, {
+        capture: true,
+        once: true,
+      });
+    }
+    this.isDragging = false;
+  }
+
+  private suppressClick = (e: Event) => {
+    e.stopPropagation();
+    e.preventDefault();
+  };
 
   setEnabled(value: boolean) {
     this.enabled = value;
