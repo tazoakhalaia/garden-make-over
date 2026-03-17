@@ -3,6 +3,7 @@ import { config, type GameEvents } from "../config";
 import { Match3MiniGame } from "../mini-game";
 import { AnimalMarket } from "./animalMarket";
 import { CoinUI } from "./coinUI";
+import { DayNightToggler } from "./dayNightToggler";
 import { MiniGameBubble } from "./miniGameBubble";
 import { MuteButton } from "./muteButton";
 import { PlantMarket } from "./plantMarket";
@@ -20,6 +21,7 @@ export class PixiUI {
   public match3!: Match3MiniGame;
   private miniGameBubble = new MiniGameBubble();
   private muteButton = new MuteButton();
+  public dayNight = new DayNightToggler();
 
   private screenSize = config.baseScreenSize;
 
@@ -57,6 +59,7 @@ export class PixiUI {
 
       this.miniGameBubble.create(this.uiLayer, () => this.showMatch3());
       this.muteButton.create(this.uiLayer);
+      this.dayNight.create(this.uiLayer);
 
       this.onResize();
       window.addEventListener("resize", this.onResize);
@@ -109,12 +112,14 @@ export class PixiUI {
     this.match3?.resize();
     this.miniGameBubble.reposition();
     this.muteButton.reposition();
+    this.dayNight.reposition();
   };
 
   destroy() {
     this.match3?.destroy();
     this.miniGameBubble.destroy();
     this.muteButton.destroy();
+    this.dayNight.destroy();
     window.removeEventListener("resize", this.onResize);
   }
 }

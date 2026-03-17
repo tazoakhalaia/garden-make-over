@@ -19,8 +19,17 @@ export class GameController {
     this._threeCanvas = threeCanvas;
   }
 
-  init() {
-    this.threeScene.initThree(this._threeCanvas, this.gameEvents);
+  async init() {
+    await this.threeScene.initThree(this._threeCanvas, this.gameEvents);
+
+    this.pixiUI.dayNight.initScene(
+      this.threeScene.scene,
+      this.threeScene.lights.hemi,
+      this.threeScene.lights.sun,
+      this.threeScene.lights.fill,
+      this.threeScene.lights.accent,
+    );
+
     this.pixiUI.initPixi(this._pixiCanvas, this.gameEvents);
     this.clickHandler.setupClickHandler(
       this._pixiCanvas,
