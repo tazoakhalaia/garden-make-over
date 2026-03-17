@@ -18,8 +18,8 @@ export class GameController {
   }
 
   init() {
-    this.threeScene.initThree(this._threeCanvas);
-    this.pixiUI.initPixi(this._pixiCanvas);
+    this.threeScene.initThree(this._threeCanvas, this.gameEvents);
+    this.pixiUI.initPixi(this._pixiCanvas, this.gameEvents);
     this.clickHandler.setupClickHandler(
       this._pixiCanvas,
       this.threeScene.perspectiveCamera,

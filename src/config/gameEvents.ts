@@ -38,6 +38,14 @@ type PlantMarketChooseEvent = {
   z: number;
 };
 
+type UiOpenedEvent = {
+  type: "ui:opened";
+};
+
+type UiClosedEvent = {
+  type: "ui:closed";
+};
+
 export type GameEventMap = {
   "placeholder:clicked": PlaceholderClickedEvent;
   "market:item-selected": MarketItemSelectedEvent;
@@ -45,6 +53,8 @@ export type GameEventMap = {
   "animalMarket:item-selected": AnimaMarketClickedEvent;
   "plantGround:clicked": PlantGroundClickedEvent;
   "buyPlant:item-selected": PlantMarketChooseEvent;
+  "ui:opened": UiOpenedEvent;
+  "ui:closed": UiClosedEvent;
 };
 
 export class GameEvents extends EventDispatcher<GameEventMap> {}

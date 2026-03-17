@@ -1,5 +1,5 @@
 import { Color, Fog, PerspectiveCamera, Scene, WebGLRenderer } from "three";
-import { LoadModels, Spawner } from "../config";
+import { GameEvents, LoadModels, Spawner } from "../config";
 import { CameraControls } from "../controller";
 import { AnimalFence } from "./animalFence";
 import { Ground } from "./Ground";
@@ -21,7 +21,10 @@ export class ThreeScene {
   public perspectiveCamera!: PerspectiveCamera;
   public renderer!: WebGLRenderer;
 
-  async initThree(canvas: HTMLCanvasElement): Promise<void> {
+  async initThree(
+    canvas: HTMLCanvasElement,
+    gameEvents: GameEvents,
+  ): Promise<void> {
     this.scene = new Scene();
     this.scene.background = new Color(0x87ceeb);
     this.scene.fog = new Fog(0x87ceeb, 100, 500);
@@ -38,7 +41,6 @@ export class ThreeScene {
     this.renderer = new WebGLRenderer({ canvas, antialias: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-
     this.renderer.shadowMap.enabled = true;
 
     await this.loadAllModels.loadAll().then(() => {
@@ -46,7 +48,7 @@ export class ThreeScene {
       this.animate();
       this.onResize();
       window.addEventListener("resize", () => this.onResize());
-      this.cameraController.init(this.perspectiveCamera, canvas);
+      this.cameraController.init(this.perspectiveCamera, canvas, gameEvents);
       this.ground.init(this.scene, this.loadAllModels);
       this.placeholder.createPlaceholder(this.scene, this.loadAllModels);
       this.animalFence.createFence(this.scene, this.loadAllModels);
@@ -58,10 +60,8 @@ export class ThreeScene {
   onResize() {
     const width = window.innerWidth;
     const height = window.innerHeight;
-
     this.perspectiveCamera.aspect = width / height;
     this.perspectiveCamera.updateProjectionMatrix();
-
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(width, height);
   }

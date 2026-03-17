@@ -1,44 +1,51 @@
 import type { PerspectiveCamera } from "three";
 import { Vector3 } from "three";
+import type { GameEvents } from "../config";
 
 export class CameraControls {
   private camera!: PerspectiveCamera;
   private isDragging = false;
   private hasDragged = false;
+  private enabled = true;
   private lastX = 0;
   private lastY = 0;
   private speed = 0.5;
 
   private target = new Vector3(0, 0, 0);
-
   private offset = new Vector3(0, 200, 80);
 
-  init(camera: PerspectiveCamera, canvas: HTMLCanvasElement) {
+  init(
+    camera: PerspectiveCamera,
+    canvas: HTMLCanvasElement,
+    gameEvents: GameEvents,
+  ) {
     this.camera = camera;
+
+    gameEvents.addEventListener("ui:opened", () => this.setEnabled(false));
+    gameEvents.addEventListener("ui:closed", () => this.setEnabled(true));
 
     window.addEventListener("mousedown", (e) => this.onMouseDown(e));
     window.addEventListener("mousemove", (e) => this.onMouseMove(e));
     window.addEventListener("mouseup", () => this.onMouseUp());
-
     window.addEventListener("touchstart", (e) => this.onTouchStart(e));
     window.addEventListener("touchmove", (e) => this.onTouchMove(e));
     window.addEventListener("touchend", () => this.onMouseUp());
   }
 
   private move(deltaX: number, deltaY: number) {
+    if (!this.enabled) return;
     this.target.x -= deltaX * this.speed;
     this.target.z -= deltaY * this.speed;
-
     this.camera.position.set(
       this.target.x + this.offset.x,
       this.target.y + this.offset.y,
       this.target.z + this.offset.z,
     );
-
     this.camera.lookAt(this.target);
   }
 
   private onMouseDown(e: MouseEvent) {
+    if (!this.enabled) return;
     this.isDragging = true;
     this.hasDragged = false;
     this.lastX = e.clientX;
@@ -58,6 +65,7 @@ export class CameraControls {
   }
 
   private onTouchStart(e: TouchEvent) {
+    if (!this.enabled) return;
     const touch = e.touches[0];
     this.isDragging = true;
     this.lastX = touch.clientX;
@@ -72,22 +80,23 @@ export class CameraControls {
     this.lastY = touch.clientY;
   }
 
+  setEnabled(value: boolean) {
+    this.enabled = value;
+  }
+
   getHasDragged(): boolean {
     return this.hasDragged;
   }
 
   clamp(minX: number, maxX: number, minZ: number, maxZ: number) {
     if (!this.camera) return;
-
     this.target.x = Math.max(minX, Math.min(maxX, this.target.x));
     this.target.z = Math.max(minZ, Math.min(maxZ, this.target.z));
-
     this.camera.position.set(
       this.target.x + this.offset.x,
       this.target.y + this.offset.y,
       this.target.z + this.offset.z,
     );
-
     this.camera.lookAt(this.target);
   }
 }
