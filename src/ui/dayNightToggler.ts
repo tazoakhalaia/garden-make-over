@@ -26,19 +26,19 @@ const DAY = {
 };
 
 const NIGHT = {
-  skyColor: 0x0a0f2e,
-  fogColor: 0x0a0f2e,
-  fogNear: 60,
-  fogFar: 300,
-  hemiSky: 0x1a2a6c,
-  hemiGround: 0x0a0a0a,
-  hemiIntensity: 0.3,
-  sunColor: 0x3344aa,
-  sunIntensity: 0.4,
-  fillColor: 0x223366,
-  fillIntensity: 0.15,
-  accentColor: 0x6688ff,
-  accentIntensity: 0.8,
+  skyColor: 0x0d1b3e,
+  fogColor: 0x0d1b3e,
+  fogNear: 80,
+  fogFar: 400,
+  hemiSky: 0x2a3f7c,
+  hemiGround: 0x1a1a2e,
+  hemiIntensity: 0.75,
+  sunColor: 0x4466cc,
+  sunIntensity: 0.9,
+  fillColor: 0x3355aa,
+  fillIntensity: 0.5,
+  accentColor: 0x88aaff,
+  accentIntensity: 1.8,
 };
 
 export class DayNightToggler {
@@ -129,12 +129,10 @@ export class DayNightToggler {
     this.container.addChild(bg);
 
     const ring = new Graphics();
-    ring
-      .circle(r, r, r - 1)
-      .stroke({
-        color: this.isDay ? 0xfbbf24 : 0x6366f1,
-        width: Math.max(2, SIZE * 0.05),
-      });
+    ring.circle(r, r, r - 1).stroke({
+      color: this.isDay ? 0xfbbf24 : 0x6366f1,
+      width: Math.max(2, SIZE * 0.05),
+    });
     this.container.addChild(ring);
 
     const icon = new Text({
