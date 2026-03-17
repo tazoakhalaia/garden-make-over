@@ -1,12 +1,4 @@
-import {
-  Application,
-  Container,
-  Graphics,
-  Sprite,
-  Text,
-  TextStyle,
-  Texture,
-} from "pixi.js";
+import { Container, Graphics, Sprite, Text, TextStyle, Texture } from "pixi.js";
 import { plantOrAnimal } from "../enums";
 
 interface Match3Options {
@@ -133,7 +125,7 @@ function calculateLayout(screenWidth: number, screenHeight: number): Layout {
 }
 
 export class Match3MiniGame {
-  private app: Application;
+  private app: Container;
   private options: Match3Options;
 
   private rootContainer!: Container;
@@ -163,7 +155,7 @@ export class Match3MiniGame {
   private savedMessageColor = 0xaad4aa;
   private isResultVisible = false;
 
-  constructor(app: Application, options: Match3Options = {}) {
+  constructor(app: Container, options: Match3Options = {}) {
     this.app = app;
     this.options = options;
   }
@@ -193,7 +185,7 @@ export class Match3MiniGame {
 
   destroy(): void {
     if (this.rootContainer) {
-      this.app.stage.removeChild(this.rootContainer);
+      this.app.removeChild(this.rootContainer);
       this.rootContainer.destroy({ children: true });
       this.isBuilt = false;
     }
@@ -201,7 +193,7 @@ export class Match3MiniGame {
 
   private rebuild(): void {
     if (this.isBuilt) {
-      this.app.stage.removeChild(this.rootContainer);
+      this.app.removeChild(this.rootContainer);
       this.rootContainer.destroy({ children: true });
       this.isBuilt = false;
     }
@@ -209,8 +201,8 @@ export class Match3MiniGame {
   }
 
   private build(): void {
-    const screenWidth = this.app.screen.width;
-    const screenHeight = this.app.screen.height;
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
     this.layout = calculateLayout(screenWidth, screenHeight);
     const layout = this.layout;
 
@@ -218,16 +210,14 @@ export class Match3MiniGame {
     this.rootContainer.visible = false;
     this.rootContainer.eventMode = "static";
     this.rootContainer.interactiveChildren = true;
-    this.app.stage.addChild(this.rootContainer);
+    this.app.addChild(this.rootContainer);
 
     const dimOverlay = new Graphics();
     dimOverlay.label = plantOrAnimal.BACKGROUND;
     dimOverlay
       .rect(0, 0, screenWidth, screenHeight)
-      .fill({ color: 0x000000, alpha: 0.55 });
-    dimOverlay.eventMode = "dynamic";
-    dimOverlay.cursor = "default";
-    dimOverlay.on("pointerdown", (event) => event.stopPropagation());
+      .fill({ color: 0x000000, alpha: 0.2 });
+    dimOverlay.label = plantOrAnimal.BACKGROUND;
     this.rootContainer.addChild(dimOverlay);
 
     const panelBackground = new Graphics();

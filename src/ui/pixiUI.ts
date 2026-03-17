@@ -43,7 +43,7 @@ export class PixiUI {
       this.app.stage.addChild(this.uiLayer);
       this.coinUI.create(this.uiLayer, 2000);
 
-      this.match3 = new Match3MiniGame(this.app, {
+      this.match3 = new Match3MiniGame(this.uiLayer, {
         onClose: (coinsEarned: number) => {
           this.gameEvents.dispatchEvent({ type: "ui:closed" });
           if (coinsEarned > 0) {
