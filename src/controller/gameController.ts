@@ -48,6 +48,8 @@ export class GameController {
     this.gameEvents.addEventListener(
       "animalMarket:item-selected",
       ({ x, y, z, id }) => {
+        const cost = 100;
+        if (!this.pixiUI.coinUI.remove(cost)) return;
         this.threeScene.spawner.spawnObjects(x, y, z, id);
         this.pixiUI.hideAnimalMarket();
       },
@@ -64,6 +66,8 @@ export class GameController {
     this.gameEvents.addEventListener(
       "buyPlant:item-selected",
       ({ x, y, z, id }) => {
+        const cost = 50;
+        if (!this.pixiUI.coinUI.remove(cost)) return;
         this.threeScene.spawner.spawnObjects(x, y, z, id);
         this.pixiUI.hidePlantMarket();
       },

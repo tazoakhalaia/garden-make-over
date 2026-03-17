@@ -1,12 +1,14 @@
 import { Application, Assets, Container } from "pixi.js";
 import { config, type GameEvents } from "../config";
 import { AnimalMarket } from "./animalMarket";
+import { CoinUI } from "./coinUI";
 import { PlantMarket } from "./plantMarket";
 import { PlantOrAnimalMarket } from "./plantOrAnimalMarket";
 
 export class PixiUI {
   private app = new Application();
   public uiLayer = new Container();
+  public coinUI = new CoinUI();
   private gameEvents!: GameEvents;
 
   public plantOrAnimalMarket = new PlantOrAnimalMarket();
@@ -33,6 +35,7 @@ export class PixiUI {
       this.uiLayer.eventMode = "static";
       this.uiLayer.interactiveChildren = true;
       this.app.stage.addChild(this.uiLayer);
+      this.coinUI.create(this.uiLayer, 500);
 
       this.onResize();
       window.addEventListener("resize", this.onResize);
