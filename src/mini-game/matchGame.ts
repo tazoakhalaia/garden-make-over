@@ -21,10 +21,10 @@ type CropKey =
   | "broccoli"
   | "sunflower";
 
-const COLS = 7;
+const COLUMNS = 7;
 const ROWS = 7;
-const TARGET = 500;
-const MOVES_TOTAL = 20;
+const TARGET_SCORE = 500;
+const TOTAL_MOVES = 20;
 
 const CROP_KEYS: CropKey[] = [
   "corn",
@@ -42,88 +42,88 @@ const CROP_COLORS = [
 interface Layout {
   tileSize: number;
   tileGap: number;
-  step: number;
-  boardPxW: number;
-  boardPxH: number;
-  pad: number;
-  panelW: number;
-  panelH: number;
+  tileStep: number;
+  boardPixelWidth: number;
+  boardPixelHeight: number;
+  padding: number;
+  panelWidth: number;
+  panelHeight: number;
   panelX: number;
   panelY: number;
   hudY: number;
-  hudBoxW: number;
-  hudBoxH: number;
-  barY: number;
-  barH: number;
-  msgY: number;
-  msgH: number;
+  hudBoxWidth: number;
+  hudBoxHeight: number;
+  progressBarY: number;
+  progressBarHeight: number;
+  messageY: number;
+  messageHeight: number;
   boardY: number;
-  btnY: number;
-  btnH: number;
-  fs: {
+  buttonY: number;
+  buttonHeight: number;
+  fontSizes: {
     title: number;
     hudLabel: number;
-    hudVal: number;
-    msg: number;
-    btn: number;
+    hudValue: number;
+    message: number;
+    button: number;
     tile: number;
   };
 }
 
-function calcLayout(sw: number, sh: number): Layout {
-  const tileFromW = Math.floor((sw * 0.94 - (COLS - 1) * 4) / COLS);
-  const tileFromH = Math.floor((sh * 0.56 - (ROWS - 1) * 4) / ROWS);
-  const tileSize = Math.max(30, Math.min(64, tileFromW, tileFromH));
+function calculateLayout(screenWidth: number, screenHeight: number): Layout {
+  const tileFromWidth = Math.floor((screenWidth * 0.94 - (COLUMNS - 1) * 4) / COLUMNS);
+  const tileFromHeight = Math.floor((screenHeight * 0.56 - (ROWS - 1) * 4) / ROWS);
+  const tileSize = Math.max(30, Math.min(64, tileFromWidth, tileFromHeight));
   const tileGap = Math.max(3, Math.round(tileSize * 0.08));
-  const step = tileSize + tileGap;
-  const boardPxW = COLS * step - tileGap;
-  const boardPxH = ROWS * step - tileGap;
-  const pad = Math.max(10, Math.round(tileSize * 0.28));
-  const s = tileSize / 64;
-  const fs = {
-    title: Math.max(13, Math.round(20 * s)),
-    hudLabel: Math.max(8, Math.round(10 * s)),
-    hudVal: Math.max(10, Math.round(16 * s)),
-    msg: Math.max(9, Math.round(13 * s)),
-    btn: Math.max(9, Math.round(13 * s)),
-    tile: Math.max(13, Math.round(28 * s)),
+  const tileStep = tileSize + tileGap;
+  const boardPixelWidth = COLUMNS * tileStep - tileGap;
+  const boardPixelHeight = ROWS * tileStep - tileGap;
+  const padding = Math.max(10, Math.round(tileSize * 0.28));
+  const scale = tileSize / 64;
+  const fontSizes = {
+    title: Math.max(13, Math.round(20 * scale)),
+    hudLabel: Math.max(8, Math.round(10 * scale)),
+    hudValue: Math.max(10, Math.round(16 * scale)),
+    message: Math.max(9, Math.round(13 * scale)),
+    button: Math.max(9, Math.round(13 * scale)),
+    tile: Math.max(13, Math.round(28 * scale)),
   };
-  const hudBoxW = Math.max(70, Math.round(100 * s));
-  const hudBoxH = Math.max(30, Math.round(40 * s));
-  const hudY = pad + Math.round(24 * s);
-  const barH = Math.max(5, Math.round(12 * s));
-  const barY = hudY + hudBoxH + Math.round(6 * s);
-  const msgH = Math.max(20, Math.round(28 * s));
-  const msgY = barY + barH + Math.round(5 * s);
-  const boardY = msgY + msgH + Math.round(4 * s);
-  const btnH = Math.max(28, Math.round(44 * s));
-  const btnY = boardY + boardPxH + pad;
-  const panelW = boardPxW + pad * 2;
-  const panelH = btnY + btnH + pad;
-  const panelX = Math.round((sw - panelW) / 2);
-  const panelY = Math.round((sh - panelH) / 2);
+  const hudBoxWidth = Math.max(70, Math.round(100 * scale));
+  const hudBoxHeight = Math.max(30, Math.round(40 * scale));
+  const hudY = padding + Math.round(24 * scale);
+  const progressBarHeight = Math.max(5, Math.round(12 * scale));
+  const progressBarY = hudY + hudBoxHeight + Math.round(6 * scale);
+  const messageHeight = Math.max(20, Math.round(28 * scale));
+  const messageY = progressBarY + progressBarHeight + Math.round(5 * scale);
+  const boardY = messageY + messageHeight + Math.round(4 * scale);
+  const buttonHeight = Math.max(28, Math.round(44 * scale));
+  const buttonY = boardY + boardPixelHeight + padding;
+  const panelWidth = boardPixelWidth + padding * 2;
+  const panelHeight = buttonY + buttonHeight + padding;
+  const panelX = Math.round((screenWidth - panelWidth) / 2);
+  const panelY = Math.round((screenHeight - panelHeight) / 2);
   return {
     tileSize,
     tileGap,
-    step,
-    boardPxW,
-    boardPxH,
-    pad,
-    panelW,
-    panelH,
+    tileStep,
+    boardPixelWidth,
+    boardPixelHeight,
+    padding,
+    panelWidth,
+    panelHeight,
     panelX,
     panelY,
     hudY,
-    hudBoxW,
-    hudBoxH,
-    barY,
-    barH,
-    msgY,
-    msgH,
+    hudBoxWidth,
+    hudBoxHeight,
+    progressBarY,
+    progressBarHeight,
+    messageY,
+    messageHeight,
     boardY,
-    btnY,
-    btnH,
-    fs,
+    buttonY,
+    buttonHeight,
+    fontSizes,
   };
 }
 
@@ -131,32 +131,32 @@ export class Match3MiniGame {
   private app: Application;
   private options: Match3Options;
 
-  private root!: Container;
-  private panel!: Container;
-  private boardCt!: Container;
-  private barFill!: Graphics;
-  private msgText!: Text;
+  private rootContainer!: Container;
+  private panelContainer!: Container;
+  private boardContainer!: Container;
+  private progressBarFill!: Graphics;
+  private messageText!: Text;
   private scoreText!: Text;
   private movesText!: Text;
   private resultPanel!: Container;
-  private resultTitle!: Text;
-  private resultSub!: Text;
-  private resultCoins!: Text;
+  private resultTitleText!: Text;
+  private resultSubText!: Text;
+  private resultCoinsText!: Text;
 
   private board: number[][] = [];
   private tiles: (Container | null)[][] = [];
-  private selected: { r: number; c: number } | null = null;
-  private busy = false;
-  private score = 0;
-  private moves = MOVES_TOTAL;
-  private coins = 0;
-  private built = false;
+  private selectedTile: { row: number; col: number } | null = null;
+  private isBusy = false;
+  private currentScore = 0;
+  private remainingMoves = TOTAL_MOVES;
+  private coinsEarned = 0;
+  private isBuilt = false;
   private isOpen = false;
-  private L!: Layout;
+  private layout!: Layout;
 
-  private savedMsg = "tap a crop to start!";
-  private savedMsgColor = 0xaad4aa;
-  private resultVisible = false;
+  private savedMessage = "tap a crop to start!";
+  private savedMessageColor = 0xaad4aa;
+  private isResultVisible = false;
 
   constructor(app: Application, options: Match3Options = {}) {
     this.app = app;
@@ -166,805 +166,841 @@ export class Match3MiniGame {
   open(): void {
     this.isOpen = true;
     this.rebuild();
-    this.root.visible = true;
+    this.rootContainer.visible = true;
     this.newGame();
   }
 
   close(coinsEarned = 0): void {
     this.isOpen = false;
-    if (this.root) this.root.visible = false;
+    if (this.rootContainer) this.rootContainer.visible = false;
     this.options.onClose?.(coinsEarned);
   }
 
   resize(): void {
     if (!this.isOpen) return;
     this.rebuild();
-    this.root.visible = true;
+    this.rootContainer.visible = true;
     this.renderBoard();
     this.updateHUD();
-    this.setMsg(this.savedMsg, this.savedMsgColor);
-    if (this.resultVisible) this.restoreResult();
+    this.setMessage(this.savedMessage, this.savedMessageColor);
+    if (this.isResultVisible) this.restoreResult();
   }
 
   destroy(): void {
-    if (this.root) {
-      this.app.stage.removeChild(this.root);
-      this.root.destroy({ children: true });
-      this.built = false;
+    if (this.rootContainer) {
+      this.app.stage.removeChild(this.rootContainer);
+      this.rootContainer.destroy({ children: true });
+      this.isBuilt = false;
     }
   }
 
   private rebuild(): void {
-    if (this.built) {
-      this.app.stage.removeChild(this.root);
-      this.root.destroy({ children: true });
-      this.built = false;
+    if (this.isBuilt) {
+      this.app.stage.removeChild(this.rootContainer);
+      this.rootContainer.destroy({ children: true });
+      this.isBuilt = false;
     }
     this.build();
   }
 
   private build(): void {
-    const sw = this.app.screen.width;
-    const sh = this.app.screen.height;
-    this.L = calcLayout(sw, sh);
-    const L = this.L;
+    const screenWidth = this.app.screen.width;
+    const screenHeight = this.app.screen.height;
+    this.layout = calculateLayout(screenWidth, screenHeight);
+    const layout = this.layout;
 
-    this.root = new Container();
-    this.root.visible = false;
-    this.root.eventMode = "static";
-    this.root.interactiveChildren = true;
-    this.app.stage.addChild(this.root);
+    this.rootContainer = new Container();
+    this.rootContainer.visible = false;
+    this.rootContainer.eventMode = "static";
+    this.rootContainer.interactiveChildren = true;
+    this.app.stage.addChild(this.rootContainer);
 
-    const dim = new Graphics();
-    dim.rect(0, 0, sw, sh).fill({ color: 0x000000, alpha: 0.55 });
-    dim.eventMode = "static";
-    dim.cursor = "default";
-    dim.on("pointerdown", (e) => e.stopPropagation());
-    this.root.addChild(dim);
+    const dimOverlay = new Graphics();
+    dimOverlay.rect(0, 0, screenWidth, screenHeight).fill({ color: 0x000000, alpha: 0.55 });
+    dimOverlay.eventMode = "static";
+    dimOverlay.cursor = "default";
+    dimOverlay.on("pointerdown", (event) => event.stopPropagation());
+    this.rootContainer.addChild(dimOverlay);
 
-    const panelBg = new Graphics();
-    panelBg
-      .roundRect(0, 0, L.panelW, L.panelH, 18)
+    const panelBackground = new Graphics();
+    panelBackground
+      .roundRect(0, 0, layout.panelWidth, layout.panelHeight, 18)
       .fill({ color: 0x1a2e1a })
       .stroke({ color: 0x4caf50, width: 2 });
 
-    this.panel = new Container();
-    this.panel.x = L.panelX;
-    this.panel.y = L.panelY;
-    this.panel.addChild(panelBg);
-    this.root.addChild(this.panel);
+    this.panelContainer = new Container();
+    this.panelContainer.x = layout.panelX;
+    this.panelContainer.y = layout.panelY;
+    this.panelContainer.addChild(panelBackground);
+    this.rootContainer.addChild(this.panelContainer);
 
-    const title = new Text({
+    const titleText = new Text({
       text: "🌾 Harvest Match",
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
-        fontSize: L.fs.title,
+        fontSize: layout.fontSizes.title,
         fontWeight: "bold",
         fill: 0xffe066,
       }),
     });
-    title.anchor.set(0.5, 0);
-    title.x = L.panelW / 2;
-    title.y = L.pad - 4;
-    this.panel.addChild(title);
+    titleText.anchor.set(0.5, 0);
+    titleText.x = layout.panelWidth / 2;
+    titleText.y = layout.padding - 4;
+    this.panelContainer.addChild(titleText);
 
     this.scoreText = this.makeHudBox(
-      L.pad,
-      L.hudY,
+      layout.padding,
+      layout.hudY,
       "SCORE",
-      String(this.score),
+      String(this.currentScore),
     );
     this.makeHudBox(
-      L.panelW / 2 - L.hudBoxW / 2,
-      L.hudY,
+      layout.panelWidth / 2 - layout.hudBoxWidth / 2,
+      layout.hudY,
       "GOAL",
-      String(TARGET),
+      String(TARGET_SCORE),
     );
     this.movesText = this.makeHudBox(
-      L.panelW - L.pad - L.hudBoxW,
-      L.hudY,
+      layout.panelWidth - layout.padding - layout.hudBoxWidth,
+      layout.hudY,
       "MOVES",
-      String(this.moves),
+      String(this.remainingMoves),
     );
 
-    const barBg = new Graphics();
-    barBg.roundRect(0, 0, L.boardPxW, L.barH, 4).fill({ color: 0x2e4a2e });
-    barBg.x = L.pad;
-    barBg.y = L.barY;
-    this.panel.addChild(barBg);
+    const progressBarBackground = new Graphics();
+    progressBarBackground
+      .roundRect(0, 0, layout.boardPixelWidth, layout.progressBarHeight, 4)
+      .fill({ color: 0x2e4a2e });
+    progressBarBackground.x = layout.padding;
+    progressBarBackground.y = layout.progressBarY;
+    this.panelContainer.addChild(progressBarBackground);
 
-    this.barFill = new Graphics();
-    this.barFill.x = L.pad;
-    this.barFill.y = L.barY;
-    this.panel.addChild(this.barFill);
+    this.progressBarFill = new Graphics();
+    this.progressBarFill.x = layout.padding;
+    this.progressBarFill.y = layout.progressBarY;
+    this.panelContainer.addChild(this.progressBarFill);
 
-    this.msgText = new Text({
+    this.messageText = new Text({
       text: "",
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
-        fontSize: L.fs.msg,
+        fontSize: layout.fontSizes.message,
         fill: 0xaad4aa,
       }),
     });
-    this.msgText.anchor.set(0.5, 0);
-    this.msgText.x = L.panelW / 2;
-    this.msgText.y = L.msgY;
-    this.panel.addChild(this.msgText);
+    this.messageText.anchor.set(0.5, 0);
+    this.messageText.x = layout.panelWidth / 2;
+    this.messageText.y = layout.messageY;
+    this.panelContainer.addChild(this.messageText);
 
-    this.boardCt = new Container();
-    this.boardCt.x = L.pad;
-    this.boardCt.y = L.boardY;
-    this.panel.addChild(this.boardCt);
+    this.boardContainer = new Container();
+    this.boardContainer.x = layout.padding;
+    this.boardContainer.y = layout.boardY;
+    this.panelContainer.addChild(this.boardContainer);
 
-    const gap = Math.round(L.pad * 0.4);
-    const bw1 = Math.round(L.boardPxW * 0.38);
-    const bw2 = Math.round(L.boardPxW * 0.27);
-    const bw3 = L.boardPxW - bw1 - bw2 - gap * 2;
-    this.makeBtn(L.pad, L.btnY, bw1, L.btnH, "🔄 New", 0x2d5a27, () =>
+    const buttonGap = Math.round(layout.padding * 0.4);
+    const newButtonWidth = Math.round(layout.boardPixelWidth * 0.38);
+    const hintButtonWidth = Math.round(layout.boardPixelWidth * 0.27);
+    const closeButtonWidth = layout.boardPixelWidth - newButtonWidth - hintButtonWidth - buttonGap * 2;
+
+    this.makeButton(layout.padding, layout.buttonY, newButtonWidth, layout.buttonHeight, "🔄 New", 0x2d5a27, () =>
       this.newGame(),
     );
-    this.makeBtn(
-      L.pad + bw1 + gap,
-      L.btnY,
-      bw2,
-      L.btnH,
+    this.makeButton(
+      layout.padding + newButtonWidth + buttonGap,
+      layout.buttonY,
+      hintButtonWidth,
+      layout.buttonHeight,
       "💡 Hint",
       0x5a4a27,
       () => this.hint(),
     );
-    this.makeBtn(
-      L.pad + bw1 + gap + bw2 + gap,
-      L.btnY,
-      bw3,
-      L.btnH,
+    this.makeButton(
+      layout.padding + newButtonWidth + buttonGap + hintButtonWidth + buttonGap,
+      layout.buttonY,
+      closeButtonWidth,
+      layout.buttonHeight,
       "✖ Close",
       0x5a2727,
-      () => this.close(this.coins),
+      () => this.close(this.coinsEarned),
     );
 
     this.buildResultPanel();
-    this.built = true;
+    this.isBuilt = true;
   }
 
-  private makeHudBox(x: number, y: number, label: string, value: string): Text {
-    const L = this.L;
-    const box = new Graphics();
-    box.roundRect(0, 0, L.hudBoxW, L.hudBoxH, 8).fill({ color: 0x2e4a2e });
-    box.x = x;
-    box.y = y;
-    this.panel.addChild(box);
-    const lbl = new Text({
-      text: label,
+  private makeHudBox(x: number, y: number, labelText: string, valueText: string): Text {
+    const layout = this.layout;
+    const hudBox = new Graphics();
+    hudBox.roundRect(0, 0, layout.hudBoxWidth, layout.hudBoxHeight, 8).fill({ color: 0x2e4a2e });
+    hudBox.x = x;
+    hudBox.y = y;
+    this.panelContainer.addChild(hudBox);
+
+    const labelDisplay = new Text({
+      text: labelText,
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
-        fontSize: L.fs.hudLabel,
+        fontSize: layout.fontSizes.hudLabel,
         fill: 0x88bb88,
       }),
     });
-    lbl.x = 5;
-    lbl.y = 4;
-    box.addChild(lbl);
-    const val = new Text({
-      text: value,
+    labelDisplay.x = 5;
+    labelDisplay.y = 4;
+    hudBox.addChild(labelDisplay);
+
+    const valueDisplay = new Text({
+      text: valueText,
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
-        fontSize: L.fs.hudVal,
+        fontSize: layout.fontSizes.hudValue,
         fontWeight: "bold",
         fill: 0xffffff,
       }),
     });
-    val.x = 5;
-    val.y = L.hudBoxH * 0.44;
-    box.addChild(val);
-    return val;
+    valueDisplay.x = 5;
+    valueDisplay.y = layout.hudBoxHeight * 0.44;
+    hudBox.addChild(valueDisplay);
+
+    return valueDisplay;
   }
 
-  private makeBtn(
+  private makeButton(
     x: number,
     y: number,
-    w: number,
-    h: number,
-    label: string,
-    color: number,
-    cb: () => void,
+    width: number,
+    height: number,
+    labelText: string,
+    backgroundColor: number,
+    onPress: () => void,
   ): Container {
-    const ct = new Container();
-    ct.x = x;
-    ct.y = y;
-    ct.eventMode = "static";
-    ct.cursor = "pointer";
-    const bg = new Graphics();
-    bg.roundRect(0, 0, w, h, 8).fill({ color });
-    ct.addChild(bg);
-    const txt = new Text({
-      text: label,
+    const buttonContainer = new Container();
+    buttonContainer.x = x;
+    buttonContainer.y = y;
+    buttonContainer.eventMode = "static";
+    buttonContainer.cursor = "pointer";
+
+    const buttonBackground = new Graphics();
+    buttonBackground.roundRect(0, 0, width, height, 8).fill({ color: backgroundColor });
+    buttonContainer.addChild(buttonBackground);
+
+    const buttonLabel = new Text({
+      text: labelText,
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
-        fontSize: this.L.fs.btn,
+        fontSize: this.layout.fontSizes.button,
         fontWeight: "bold",
         fill: 0xffffff,
       }),
     });
-    txt.anchor.set(0.5);
-    txt.x = w / 2;
-    txt.y = h / 2;
-    ct.addChild(txt);
-    ct.on("pointerdown", () => {
-      ct.alpha = 0.7;
+    buttonLabel.anchor.set(0.5);
+    buttonLabel.x = width / 2;
+    buttonLabel.y = height / 2;
+    buttonContainer.addChild(buttonLabel);
+
+    buttonContainer.on("pointerdown", () => {
+      buttonContainer.alpha = 0.7;
     });
-    ct.on("pointerup", () => {
-      ct.alpha = 1.0;
-      cb();
+    buttonContainer.on("pointerup", () => {
+      buttonContainer.alpha = 1.0;
+      onPress();
     });
-    ct.on("pointerupoutside", () => {
-      ct.alpha = 1.0;
+    buttonContainer.on("pointerupoutside", () => {
+      buttonContainer.alpha = 1.0;
     });
-    this.panel.addChild(ct);
-    return ct;
+
+    this.panelContainer.addChild(buttonContainer);
+    return buttonContainer;
   }
 
   private buildResultPanel(): void {
-    const L = this.L;
-    const ow = Math.min(Math.round(L.panelW * 0.88), 320);
-    const oh = Math.round(ow * 0.56);
-    const ox = Math.round((L.panelW - ow) / 2);
-    const oy = Math.round((L.panelH - oh) / 2);
-    const tFs = Math.max(12, L.fs.title);
-    const sFs = Math.max(9, L.fs.msg);
-    const cFs = Math.max(13, Math.round(tFs * 1.15));
+    const layout = this.layout;
+    const overlayWidth = Math.min(Math.round(layout.panelWidth * 0.88), 320);
+    const overlayHeight = Math.round(overlayWidth * 0.56);
+    const overlayX = Math.round((layout.panelWidth - overlayWidth) / 2);
+    const overlayY = Math.round((layout.panelHeight - overlayHeight) / 2);
+    const titleFontSize = Math.max(12, layout.fontSizes.title);
+    const subFontSize = Math.max(9, layout.fontSizes.message);
+    const coinsFontSize = Math.max(13, Math.round(titleFontSize * 1.15));
 
-    const bg = new Graphics();
-    bg.roundRect(0, 0, ow, oh, 16)
+    const overlayBackground = new Graphics();
+    overlayBackground
+      .roundRect(0, 0, overlayWidth, overlayHeight, 16)
       .fill({ color: 0x0d1f0d, alpha: 0.97 })
       .stroke({ color: 0xffd700, width: 2 });
 
     this.resultPanel = new Container();
-    this.resultPanel.x = ox;
-    this.resultPanel.y = oy;
-    this.resultPanel.addChild(bg);
+    this.resultPanel.x = overlayX;
+    this.resultPanel.y = overlayY;
+    this.resultPanel.addChild(overlayBackground);
     this.resultPanel.visible = false;
-    this.panel.addChild(this.resultPanel);
+    this.panelContainer.addChild(this.resultPanel);
 
-    this.resultTitle = new Text({
+    this.resultTitleText = new Text({
       text: "",
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
-        fontSize: tFs,
+        fontSize: titleFontSize,
         fontWeight: "bold",
         fill: 0xffe066,
         align: "center",
       }),
     });
-    this.resultTitle.anchor.set(0.5, 0);
-    this.resultTitle.x = ow / 2;
-    this.resultTitle.y = oh * 0.1;
-    this.resultPanel.addChild(this.resultTitle);
+    this.resultTitleText.anchor.set(0.5, 0);
+    this.resultTitleText.x = overlayWidth / 2;
+    this.resultTitleText.y = overlayHeight * 0.1;
+    this.resultPanel.addChild(this.resultTitleText);
 
-    this.resultSub = new Text({
+    this.resultSubText = new Text({
       text: "",
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
-        fontSize: sFs,
+        fontSize: subFontSize,
         fill: 0xaad4aa,
         align: "center",
       }),
     });
-    this.resultSub.anchor.set(0.5, 0);
-    this.resultSub.x = ow / 2;
-    this.resultSub.y = oh * 0.36;
-    this.resultPanel.addChild(this.resultSub);
+    this.resultSubText.anchor.set(0.5, 0);
+    this.resultSubText.x = overlayWidth / 2;
+    this.resultSubText.y = overlayHeight * 0.36;
+    this.resultPanel.addChild(this.resultSubText);
 
-    this.resultCoins = new Text({
+    this.resultCoinsText = new Text({
       text: "",
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
-        fontSize: cFs,
+        fontSize: coinsFontSize,
         fontWeight: "bold",
         fill: 0xffd700,
         align: "center",
       }),
     });
-    this.resultCoins.anchor.set(0.5, 0);
-    this.resultCoins.x = ow / 2;
-    this.resultCoins.y = oh * 0.53;
-    this.resultPanel.addChild(this.resultCoins);
+    this.resultCoinsText.anchor.set(0.5, 0);
+    this.resultCoinsText.x = overlayWidth / 2;
+    this.resultCoinsText.y = overlayHeight * 0.53;
+    this.resultPanel.addChild(this.resultCoinsText);
 
-    const bw = Math.round(ow * 0.38);
-    const bh = Math.max(24, Math.round(oh * 0.22));
-    const by = oh - bh - Math.round(oh * 0.08);
+    const resultButtonWidth = Math.round(overlayWidth * 0.38);
+    const resultButtonHeight = Math.max(24, Math.round(overlayHeight * 0.22));
+    const resultButtonY = overlayHeight - resultButtonHeight - Math.round(overlayHeight * 0.08);
 
-    const playBtn = this.makeResultBtn(
-      Math.round(ow * 0.06),
-      by,
-      bw,
-      bh,
+    const playAgainButton = this.makeResultButton(
+      Math.round(overlayWidth * 0.06),
+      resultButtonY,
+      resultButtonWidth,
+      resultButtonHeight,
       "▶ Play Again",
       0x2d5a27,
-      sFs,
+      subFontSize,
     );
-    playBtn.on("pointerup", () => {
+    playAgainButton.on("pointerup", () => {
       this.resultPanel.visible = false;
-      this.resultVisible = false;
+      this.isResultVisible = false;
       this.newGame();
     });
-    this.resultPanel.addChild(playBtn);
+    this.resultPanel.addChild(playAgainButton);
 
-    const colBtn = this.makeResultBtn(
-      ow - Math.round(ow * 0.06) - bw,
-      by,
-      bw,
-      bh,
+    const collectButton = this.makeResultButton(
+      overlayWidth - Math.round(overlayWidth * 0.06) - resultButtonWidth,
+      resultButtonY,
+      resultButtonWidth,
+      resultButtonHeight,
       "✔ Collect",
       0x5a7a27,
-      sFs,
+      subFontSize,
     );
-    colBtn.on("pointerup", () => this.close(this.coins));
-    this.resultPanel.addChild(colBtn);
+    collectButton.on("pointerup", () => this.close(this.coinsEarned));
+    this.resultPanel.addChild(collectButton);
   }
 
-  private makeResultBtn(
+  private makeResultButton(
     x: number,
     y: number,
-    w: number,
-    h: number,
-    label: string,
-    color: number,
-    fs: number,
+    width: number,
+    height: number,
+    labelText: string,
+    backgroundColor: number,
+    fontSize: number,
   ): Container {
-    const ct = new Container();
-    ct.x = x;
-    ct.y = y;
-    ct.eventMode = "static";
-    ct.cursor = "pointer";
-    const bg = new Graphics();
-    bg.roundRect(0, 0, w, h, 8).fill({ color });
-    ct.addChild(bg);
-    const txt = new Text({
-      text: label,
+    const buttonContainer = new Container();
+    buttonContainer.x = x;
+    buttonContainer.y = y;
+    buttonContainer.eventMode = "static";
+    buttonContainer.cursor = "pointer";
+
+    const buttonBackground = new Graphics();
+    buttonBackground.roundRect(0, 0, width, height, 8).fill({ color: backgroundColor });
+    buttonContainer.addChild(buttonBackground);
+
+    const buttonLabel = new Text({
+      text: labelText,
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
-        fontSize: fs,
+        fontSize: fontSize,
         fontWeight: "bold",
         fill: 0xffffff,
       }),
     });
-    txt.anchor.set(0.5);
-    txt.x = w / 2;
-    txt.y = h / 2;
-    ct.addChild(txt);
-    ct.on("pointerdown", () => {
-      ct.alpha = 0.7;
+    buttonLabel.anchor.set(0.5);
+    buttonLabel.x = width / 2;
+    buttonLabel.y = height / 2;
+    buttonContainer.addChild(buttonLabel);
+
+    buttonContainer.on("pointerdown", () => {
+      buttonContainer.alpha = 0.7;
     });
-    ct.on("pointerupoutside", () => {
-      ct.alpha = 1.0;
+    buttonContainer.on("pointerupoutside", () => {
+      buttonContainer.alpha = 1.0;
     });
-    return ct;
+
+    return buttonContainer;
   }
 
   private newGame(): void {
-    this.score = 0;
-    this.moves = MOVES_TOTAL;
-    this.coins = 0;
-    this.selected = null;
-    this.busy = false;
-    this.resultVisible = false;
+    this.currentScore = 0;
+    this.remainingMoves = TOTAL_MOVES;
+    this.coinsEarned = 0;
+    this.selectedTile = null;
+    this.isBusy = false;
+    this.isResultVisible = false;
     this.resultPanel.visible = false;
-    let tries = 0;
+
+    let attempts = 0;
     do {
       this.board = Array.from({ length: ROWS }, () =>
-        Array.from({ length: COLS }, () =>
+        Array.from({ length: COLUMNS }, () =>
           Math.floor(Math.random() * CROP_KEYS.length),
         ),
       );
-      tries++;
-    } while ((this.findMatches().length > 0 || !this.hasMove()) && tries < 200);
+      attempts++;
+    } while ((this.findMatches().length > 0 || !this.hasValidMove()) && attempts < 200);
+
     this.renderBoard();
     this.updateHUD();
-    this.setMsg("tap a crop to start!", 0xaad4aa);
+    this.setMessage("tap a crop to start!", 0xaad4aa);
   }
 
   private renderBoard(): void {
-    const L = this.L;
-    this.boardCt.removeChildren();
+    const layout = this.layout;
+    this.boardContainer.removeChildren();
     this.tiles = [];
-    for (let r = 0; r < ROWS; r++) {
-      this.tiles[r] = [];
-      for (let c = 0; c < COLS; c++) {
-        const tile = this.makeTile(this.board[r][c]);
-        tile.x = c * L.step + L.tileSize / 2;
-        tile.y = r * L.step + L.tileSize / 2;
-        this.boardCt.addChild(tile);
-        this.tiles[r][c] = tile;
+
+    for (let row = 0; row < ROWS; row++) {
+      this.tiles[row] = [];
+      for (let col = 0; col < COLUMNS; col++) {
+        const tile = this.makeTile(this.board[row][col]);
+        tile.x = col * layout.tileStep + layout.tileSize / 2;
+        tile.y = row * layout.tileStep + layout.tileSize / 2;
+        this.boardContainer.addChild(tile);
+        this.tiles[row][col] = tile;
         tile.eventMode = "static";
         tile.cursor = "pointer";
-        tile.on("pointerdown", () => this.onTap(r, c));
+        tile.on("pointerdown", () => this.onTileTap(row, col));
       }
     }
   }
 
-  private makeTile(cropIdx: number): Container {
-    const T = this.L.tileSize;
-    const fs = this.L.fs.tile;
-    const ct = new Container();
-    ct.pivot.set(T / 2, T / 2);
-    const tex = this.options.textures?.[CROP_KEYS[cropIdx]];
-    if (tex) {
-      const sp = new Sprite(tex);
-      sp.width = T - 4;
-      sp.height = T - 4;
-      sp.x = 2;
-      sp.y = 2;
-      ct.addChild(sp);
+  private makeTile(cropIndex: number): Container {
+    const tileSize = this.layout.tileSize;
+    const fontSize = this.layout.fontSizes.tile;
+    const tileContainer = new Container();
+    tileContainer.pivot.set(tileSize / 2, tileSize / 2);
+
+    const texture = this.options.textures?.[CROP_KEYS[cropIndex]];
+    if (texture) {
+      const sprite = new Sprite(texture);
+      sprite.width = tileSize - 4;
+      sprite.height = tileSize - 4;
+      sprite.x = 2;
+      sprite.y = 2;
+      tileContainer.addChild(sprite);
     } else {
-      const bg = new Graphics();
-      bg.roundRect(0, 0, T, T, Math.round(T * 0.18)).fill({
-        color: CROP_COLORS[cropIdx],
-        alpha: 0.9,
+      const tileBackground = new Graphics();
+      tileBackground
+        .roundRect(0, 0, tileSize, tileSize, Math.round(tileSize * 0.18))
+        .fill({ color: CROP_COLORS[cropIndex], alpha: 0.9 });
+      tileContainer.addChild(tileBackground);
+
+      const emojiLabel = new Text({
+        text: CROP_EMOJI[cropIndex],
+        style: new TextStyle({ fontSize }),
       });
-      ct.addChild(bg);
-      const label = new Text({
-        text: CROP_EMOJI[cropIdx],
-        style: new TextStyle({ fontSize: fs }),
-      });
-      label.anchor.set(0.5);
-      label.x = T / 2;
-      label.y = T / 2;
-      ct.addChild(label);
+      emojiLabel.anchor.set(0.5);
+      emojiLabel.x = tileSize / 2;
+      emojiLabel.y = tileSize / 2;
+      tileContainer.addChild(emojiLabel);
     }
-    const ring = new Graphics();
-    ring
-      .roundRect(1, 1, T - 2, T - 2, Math.round(T * 0.18))
-      .stroke({ color: 0xffff00, width: Math.max(2, Math.round(T * 0.05)) });
-    ring.visible = false;
-    ring.label = "ring";
-    ct.addChild(ring);
-    return ct;
+
+    const selectionRing = new Graphics();
+    selectionRing
+      .roundRect(1, 1, tileSize - 2, tileSize - 2, Math.round(tileSize * 0.18))
+      .stroke({ color: 0xffff00, width: Math.max(2, Math.round(tileSize * 0.05)) });
+    selectionRing.visible = false;
+    selectionRing.label = "ring";
+    tileContainer.addChild(selectionRing);
+
+    return tileContainer;
   }
 
-  private onTap(r: number, c: number): void {
-    if (this.busy) return;
-    if (!this.selected) {
-      this.selectTile(r, c);
+  private onTileTap(row: number, col: number): void {
+    if (this.isBusy) return;
+
+    if (!this.selectedTile) {
+      this.selectTile(row, col);
       return;
     }
-    const { r: sr, c: sc } = this.selected;
-    if (sr === r && sc === c) {
-      this.deselectAll();
+
+    const selectedRow = this.selectedTile.row;
+    const selectedCol = this.selectedTile.col;
+
+    if (selectedRow === row && selectedCol === col) {
+      this.deselectAllTiles();
       return;
     }
-    const adjacent = Math.abs(sr - r) + Math.abs(sc - c) === 1;
-    if (!adjacent) {
-      this.deselectAll();
-      this.selectTile(r, c);
+
+    const isAdjacent = Math.abs(selectedRow - row) + Math.abs(selectedCol - col) === 1;
+    if (!isAdjacent) {
+      this.deselectAllTiles();
+      this.selectTile(row, col);
       return;
     }
-    this.deselectAll();
-    this.doSwap(sr, sc, r, c);
+
+    this.deselectAllTiles();
+    this.doSwap(selectedRow, selectedCol, row, col);
   }
 
-  private selectTile(r: number, c: number): void {
-    this.selected = { r, c };
-    const tile = this.tiles[r]?.[c];
+  private selectTile(row: number, col: number): void {
+    this.selectedTile = { row, col };
+    const tile = this.tiles[row]?.[col];
     if (!tile) return;
-    const ring = tile.children.find((ch) => ch.label === "ring") as
-      | Graphics
-      | undefined;
-    if (ring) ring.visible = true;
+    const selectionRing = tile.children.find((child) => child.label === "ring") as Graphics | undefined;
+    if (selectionRing) selectionRing.visible = true;
     this.tweenScale(tile, 1.12, 80);
   }
 
-  private deselectAll(): void {
-    for (let r = 0; r < ROWS; r++)
-      for (let c = 0; c < COLS; c++) {
-        const tile = this.tiles[r]?.[c];
+  private deselectAllTiles(): void {
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLUMNS; col++) {
+        const tile = this.tiles[row]?.[col];
         if (!tile) continue;
-        const ring = tile.children.find((ch) => ch.label === "ring") as
-          | Graphics
-          | undefined;
-        if (ring) ring.visible = false;
+        const selectionRing = tile.children.find((child) => child.label === "ring") as Graphics | undefined;
+        if (selectionRing) selectionRing.visible = false;
         this.tweenScale(tile, 1.0, 80);
       }
-    this.selected = null;
+    }
+    this.selectedTile = null;
   }
 
   private async doSwap(
-    r1: number,
-    c1: number,
-    r2: number,
-    c2: number,
+    row1: number,
+    col1: number,
+    row2: number,
+    col2: number,
   ): Promise<void> {
-    this.busy = true;
-    this.swapData(r1, c1, r2, c2);
-    await this.animSwap(r1, c1, r2, c2);
+    this.isBusy = true;
+    this.swapBoardData(row1, col1, row2, col2);
+    await this.animateSwap(row1, col1, row2, col2);
+
     if (this.findMatches().length === 0) {
-      this.swapData(r1, c1, r2, c2);
-      await this.animSwap(r1, c1, r2, c2);
-      this.setMsg("no match there!", 0xff6b6b);
-      this.busy = false;
+      this.swapBoardData(row1, col1, row2, col2);
+      await this.animateSwap(row1, col1, row2, col2);
+      this.setMessage("no match there!", 0xff6b6b);
+      this.isBusy = false;
       return;
     }
-    this.moves--;
+
+    this.remainingMoves--;
     this.updateHUD();
-    await this.resolveChain();
-    if (this.score >= TARGET) {
+    await this.resolveMatchChain();
+
+    if (this.currentScore >= TARGET_SCORE) {
       this.showResult(true);
       return;
     }
-    if (this.moves <= 0) {
+    if (this.remainingMoves <= 0) {
       this.showResult(false);
       return;
     }
-    if (!this.hasMove()) {
-      await this.reshuffle();
+    if (!this.hasValidMove()) {
+      await this.reshuffleBoard();
     }
-    this.setMsg("", 0xaad4aa);
-    this.busy = false;
+
+    this.setMessage("", 0xaad4aa);
+    this.isBusy = false;
   }
 
-  private async resolveChain(): Promise<void> {
-    let chain = 0;
+  private async resolveMatchChain(): Promise<void> {
+    let chainCount = 0;
     while (true) {
       const matches = this.findMatches();
       if (matches.length === 0) break;
-      chain++;
-      const pts = matches.length * (10 + (chain - 1) * 5);
-      this.score += pts;
-      this.setMsg(
-        `+${pts} pts${chain > 1 ? ` chain ×${chain}!` : ""}`,
-        chain > 1 ? 0xffd700 : 0x90ee90,
+      chainCount++;
+      const pointsEarned = matches.length * (10 + (chainCount - 1) * 5);
+      this.currentScore += pointsEarned;
+      this.setMessage(
+        `+${pointsEarned} pts${chainCount > 1 ? ` chain ×${chainCount}!` : ""}`,
+        chainCount > 1 ? 0xffd700 : 0x90ee90,
       );
-      await this.animPop(matches);
-      this.dropDown();
-      this.fillTop();
+      await this.animatePop(matches);
+      this.dropTilesDown();
+      this.fillEmptyTiles();
       this.renderBoard();
       this.updateHUD();
       await this.wait(100);
     }
   }
 
-  private swapData(r1: number, c1: number, r2: number, c2: number): void {
-    const tmp = this.board[r1][c1];
-    this.board[r1][c1] = this.board[r2][c2];
-    this.board[r2][c2] = tmp;
+  private swapBoardData(row1: number, col1: number, row2: number, col2: number): void {
+    const temporary = this.board[row1][col1];
+    this.board[row1][col1] = this.board[row2][col2];
+    this.board[row2][col2] = temporary;
   }
 
   private findMatches(): [number, number][] {
-    const matched = new Set<number>();
-    for (let r = 0; r < ROWS; r++)
-      for (let c = 0; c < COLS - 2; c++) {
-        const v = this.board[r][c];
-        if (v === null) continue;
-        if (v === this.board[r][c + 1] && v === this.board[r][c + 2]) {
-          let e = c + 2;
-          while (e + 1 < COLS && this.board[r][e + 1] === v) e++;
-          for (let k = c; k <= e; k++) matched.add(r * COLS + k);
+    const matchedSet = new Set<number>();
+
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLUMNS - 2; col++) {
+        const value = this.board[row][col];
+        if (value === null) continue;
+        if (value === this.board[row][col + 1] && value === this.board[row][col + 2]) {
+          let endCol = col + 2;
+          while (endCol + 1 < COLUMNS && this.board[row][endCol + 1] === value) endCol++;
+          for (let index = col; index <= endCol; index++) matchedSet.add(row * COLUMNS + index);
         }
       }
-    for (let c = 0; c < COLS; c++)
-      for (let r = 0; r < ROWS - 2; r++) {
-        const v = this.board[r][c];
-        if (v === null) continue;
-        if (v === this.board[r + 1][c] && v === this.board[r + 2][c]) {
-          let e = r + 2;
-          while (e + 1 < ROWS && this.board[e + 1][c] === v) e++;
-          for (let k = r; k <= e; k++) matched.add(k * COLS + c);
+    }
+
+    for (let col = 0; col < COLUMNS; col++) {
+      for (let row = 0; row < ROWS - 2; row++) {
+        const value = this.board[row][col];
+        if (value === null) continue;
+        if (value === this.board[row + 1][col] && value === this.board[row + 2][col]) {
+          let endRow = row + 2;
+          while (endRow + 1 < ROWS && this.board[endRow + 1][col] === value) endRow++;
+          for (let index = row; index <= endRow; index++) matchedSet.add(index * COLUMNS + col);
         }
       }
-    return [...matched].map((i) => [Math.floor(i / COLS), i % COLS]);
+    }
+
+    return [...matchedSet].map((index) => [Math.floor(index / COLUMNS), index % COLUMNS]);
   }
 
-  private dropDown(): void {
-    for (let c = 0; c < COLS; c++) {
-      let empty = ROWS - 1;
-      for (let r = ROWS - 1; r >= 0; r--) {
-        if (this.board[r][c] !== null) {
-          this.board[empty][c] = this.board[r][c];
-          if (empty !== r) this.board[r][c] = null as unknown as number;
-          empty--;
+  private dropTilesDown(): void {
+    for (let col = 0; col < COLUMNS; col++) {
+      let emptyRow = ROWS - 1;
+      for (let row = ROWS - 1; row >= 0; row--) {
+        if (this.board[row][col] !== null) {
+          this.board[emptyRow][col] = this.board[row][col];
+          if (emptyRow !== row) this.board[row][col] = null as unknown as number;
+          emptyRow--;
         }
       }
-      for (let r = empty; r >= 0; r--)
-        this.board[r][c] = null as unknown as number;
+      for (let row = emptyRow; row >= 0; row--) {
+        this.board[row][col] = null as unknown as number;
+      }
     }
   }
 
-  private fillTop(): void {
-    for (let r = 0; r < ROWS; r++)
-      for (let c = 0; c < COLS; c++)
-        if (this.board[r][c] === null)
-          this.board[r][c] = Math.floor(Math.random() * CROP_KEYS.length);
-  }
-
-  private hasMove(): boolean {
-    for (let r = 0; r < ROWS; r++)
-      for (let c = 0; c < COLS; c++) {
-        if (c < COLS - 1) {
-          this.swapData(r, c, r, c + 1);
-          const ok = this.findMatches().length > 0;
-          this.swapData(r, c, r, c + 1);
-          if (ok) return true;
-        }
-        if (r < ROWS - 1) {
-          this.swapData(r, c, r + 1, c);
-          const ok = this.findMatches().length > 0;
-          this.swapData(r, c, r + 1, c);
-          if (ok) return true;
+  private fillEmptyTiles(): void {
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLUMNS; col++) {
+        if (this.board[row][col] === null) {
+          this.board[row][col] = Math.floor(Math.random() * CROP_KEYS.length);
         }
       }
+    }
+  }
+
+  private hasValidMove(): boolean {
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLUMNS; col++) {
+        if (col < COLUMNS - 1) {
+          this.swapBoardData(row, col, row, col + 1);
+          const hasMatch = this.findMatches().length > 0;
+          this.swapBoardData(row, col, row, col + 1);
+          if (hasMatch) return true;
+        }
+        if (row < ROWS - 1) {
+          this.swapBoardData(row, col, row + 1, col);
+          const hasMatch = this.findMatches().length > 0;
+          this.swapBoardData(row, col, row + 1, col);
+          if (hasMatch) return true;
+        }
+      }
+    }
     return false;
   }
 
-  private async reshuffle(): Promise<void> {
-    this.setMsg("reshuffling board...", 0xffd700);
+  private async reshuffleBoard(): Promise<void> {
+    this.setMessage("reshuffling board...", 0xffd700);
     await this.wait(500);
-    let tries = 0;
+    let attempts = 0;
     do {
       this.board = Array.from({ length: ROWS }, () =>
-        Array.from({ length: COLS }, () =>
+        Array.from({ length: COLUMNS }, () =>
           Math.floor(Math.random() * CROP_KEYS.length),
         ),
       );
-      tries++;
-    } while ((this.findMatches().length > 0 || !this.hasMove()) && tries < 200);
+      attempts++;
+    } while ((this.findMatches().length > 0 || !this.hasValidMove()) && attempts < 200);
     this.renderBoard();
   }
 
   private hint(): void {
-    if (this.busy) return;
-    for (let r = 0; r < ROWS; r++)
-      for (let c = 0; c < COLS; c++) {
-        if (c < COLS - 1) {
-          this.swapData(r, c, r, c + 1);
-          const ok = this.findMatches().length > 0;
-          this.swapData(r, c, r, c + 1);
-          if (ok) {
-            this.flashHint([
-              [r, c],
-              [r, c + 1],
-            ]);
+    if (this.isBusy) return;
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLUMNS; col++) {
+        if (col < COLUMNS - 1) {
+          this.swapBoardData(row, col, row, col + 1);
+          const hasMatch = this.findMatches().length > 0;
+          this.swapBoardData(row, col, row, col + 1);
+          if (hasMatch) {
+            this.flashHintTiles([[row, col], [row, col + 1]]);
             return;
           }
         }
-        if (r < ROWS - 1) {
-          this.swapData(r, c, r + 1, c);
-          const ok = this.findMatches().length > 0;
-          this.swapData(r, c, r + 1, c);
-          if (ok) {
-            this.flashHint([
-              [r, c],
-              [r + 1, c],
-            ]);
+        if (row < ROWS - 1) {
+          this.swapBoardData(row, col, row + 1, col);
+          const hasMatch = this.findMatches().length > 0;
+          this.swapBoardData(row, col, row + 1, col);
+          if (hasMatch) {
+            this.flashHintTiles([[row, col], [row + 1, col]]);
             return;
           }
         }
       }
+    }
   }
 
-  private flashHint(cells: [number, number][]): void {
-    let count = 0;
-    const iv = setInterval(() => {
-      cells.forEach(([r, c]) => {
-        const t = this.tiles[r]?.[c];
-        if (t) t.alpha = t.alpha > 0.6 ? 0.35 : 1.0;
+  private flashHintTiles(cells: [number, number][]): void {
+    let flashCount = 0;
+    const flashInterval = setInterval(() => {
+      cells.forEach(([row, col]) => {
+        const tile = this.tiles[row]?.[col];
+        if (tile) tile.alpha = tile.alpha > 0.6 ? 0.35 : 1.0;
       });
-      if (++count >= 6) {
-        clearInterval(iv);
-        cells.forEach(([r, c]) => {
-          const t = this.tiles[r]?.[c];
-          if (t) t.alpha = 1.0;
+      if (++flashCount >= 6) {
+        clearInterval(flashInterval);
+        cells.forEach(([row, col]) => {
+          const tile = this.tiles[row]?.[col];
+          if (tile) tile.alpha = 1.0;
         });
       }
     }, 150);
   }
 
   private showResult(won: boolean): void {
-    this.coins = Math.max(0, Math.floor(this.score / 10));
-    this.resultVisible = true;
+    this.coinsEarned = Math.max(0, Math.floor(this.currentScore / 10));
+    this.isResultVisible = true;
     this.updateHUD();
-    this.resultTitle.text = won ? "🌾 Harvest Complete!" : "💀 Out of Moves!";
-    this.resultSub.text = won
-      ? `Score: ${this.score}  •  Moves left: ${this.moves}`
-      : `Score: ${this.score}  •  Goal: ${TARGET}`;
-    this.resultCoins.text = `🪙 ${this.coins} coins earned`;
+    this.resultTitleText.text = won ? "🌾 Harvest Complete!" : "💀 Out of Moves!";
+    this.resultSubText.text = won
+      ? `Score: ${this.currentScore}  •  Moves left: ${this.remainingMoves}`
+      : `Score: ${this.currentScore}  •  Goal: ${TARGET_SCORE}`;
+    this.resultCoinsText.text = `🪙 ${this.coinsEarned} coins earned`;
     this.resultPanel.visible = true;
-    this.busy = true;
+    this.isBusy = true;
   }
 
   private restoreResult(): void {
-    this.resultTitle.text =
-      this.score >= TARGET ? "🌾 Harvest Complete!" : "💀 Out of Moves!";
-    this.resultSub.text =
-      this.score >= TARGET
-        ? `Score: ${this.score}  •  Moves left: ${this.moves}`
-        : `Score: ${this.score}  •  Goal: ${TARGET}`;
-    this.resultCoins.text = `🪙 ${this.coins} coins earned`;
+    this.resultTitleText.text =
+      this.currentScore >= TARGET_SCORE ? "🌾 Harvest Complete!" : "💀 Out of Moves!";
+    this.resultSubText.text =
+      this.currentScore >= TARGET_SCORE
+        ? `Score: ${this.currentScore}  •  Moves left: ${this.remainingMoves}`
+        : `Score: ${this.currentScore}  •  Goal: ${TARGET_SCORE}`;
+    this.resultCoinsText.text = `🪙 ${this.coinsEarned} coins earned`;
     this.resultPanel.visible = true;
   }
 
   private updateHUD(): void {
-    const pct = Math.min(1, this.score / TARGET);
-    this.scoreText.text = String(this.score);
-    this.movesText.text = String(this.moves);
-    this.barFill
+    const progressPercent = Math.min(1, this.currentScore / TARGET_SCORE);
+    this.scoreText.text = String(this.currentScore);
+    this.movesText.text = String(this.remainingMoves);
+    this.progressBarFill
       .clear()
-      .roundRect(0, 0, Math.round(this.L.boardPxW * pct), this.L.barH, 4)
+      .roundRect(0, 0, Math.round(this.layout.boardPixelWidth * progressPercent), this.layout.progressBarHeight, 4)
       .fill({ color: 0x4caf50 });
   }
 
-  private setMsg(text: string, color: number = 0xaad4aa): void {
-    this.savedMsg = text;
-    this.savedMsgColor = color;
-    this.msgText.text = text;
-    this.msgText.style.fill = color;
+  private setMessage(text: string, color: number = 0xaad4aa): void {
+    this.savedMessage = text;
+    this.savedMessageColor = color;
+    this.messageText.text = text;
+    this.messageText.style.fill = color;
   }
 
-  private async animSwap(
-    r1: number,
-    c1: number,
-    r2: number,
-    c2: number,
+  private async animateSwap(
+    row1: number,
+    col1: number,
+    row2: number,
+    col2: number,
   ): Promise<void> {
-    const t1 = this.tiles[r1]?.[c1];
-    const t2 = this.tiles[r2]?.[c2];
-    if (!t1 || !t2) return;
-    const x1 = t1.x,
-      y1 = t1.y,
-      x2 = t2.x,
-      y2 = t2.y;
-    for (let i = 1; i <= 8; i++) {
-      const p = i / 8;
-      t1.x = x1 + (x2 - x1) * p;
-      t1.y = y1 + (y2 - y1) * p;
-      t2.x = x2 + (x1 - x2) * p;
-      t2.y = y2 + (y1 - y2) * p;
+    const tile1 = this.tiles[row1]?.[col1];
+    const tile2 = this.tiles[row2]?.[col2];
+    if (!tile1 || !tile2) return;
+
+    const startX1 = tile1.x, startY1 = tile1.y;
+    const startX2 = tile2.x, startY2 = tile2.y;
+
+    for (let step = 1; step <= 8; step++) {
+      const progress = step / 8;
+      tile1.x = startX1 + (startX2 - startX1) * progress;
+      tile1.y = startY1 + (startY2 - startY1) * progress;
+      tile2.x = startX2 + (startX1 - startX2) * progress;
+      tile2.y = startY2 + (startY1 - startY2) * progress;
       await this.wait(16);
     }
-    this.tiles[r1][c1] = t2;
-    this.tiles[r2][c2] = t1;
-    t1.x = x2;
-    t1.y = y2;
-    t2.x = x1;
-    t2.y = y1;
+
+    this.tiles[row1][col1] = tile2;
+    this.tiles[row2][col2] = tile1;
+    tile1.x = startX2;
+    tile1.y = startY2;
+    tile2.x = startX1;
+    tile2.y = startY1;
   }
 
-  private async animPop(cells: [number, number][]): Promise<void> {
-    const tiles = cells
-      .map(([r, c]) => this.tiles[r]?.[c])
+  private async animatePop(cells: [number, number][]): Promise<void> {
+    const tilesToPop = cells
+      .map(([row, col]) => this.tiles[row]?.[col])
       .filter(Boolean) as Container[];
-    for (let i = 1; i <= 8; i++) {
-      const p = i / 8;
-      const scl = Math.max(0, 1 + 0.15 * Math.sin(Math.PI * p) - p * 0.4);
-      tiles.forEach((t) => {
-        t.scale.set(scl);
-        t.alpha = 1 - p * 0.8;
+
+    for (let step = 1; step <= 8; step++) {
+      const progress = step / 8;
+      const scale = Math.max(0, 1 + 0.15 * Math.sin(Math.PI * progress) - progress * 0.4);
+      tilesToPop.forEach((tile) => {
+        tile.scale.set(scale);
+        tile.alpha = 1 - progress * 0.8;
       });
       await this.wait(18);
     }
-    cells.forEach(([r, c]) => {
-      const t = this.tiles[r]?.[c];
-      if (t) {
-        this.boardCt.removeChild(t);
-        t.destroy({ children: true });
+
+    cells.forEach(([row, col]) => {
+      const tile = this.tiles[row]?.[col];
+      if (tile) {
+        this.boardContainer.removeChild(tile);
+        tile.destroy({ children: true });
       }
-      if (this.tiles[r]) this.tiles[r][c] = null;
-      this.board[r][c] = null as unknown as number;
+      if (this.tiles[row]) this.tiles[row][col] = null;
+      this.board[row][col] = null as unknown as number;
     });
   }
 
-  private tweenScale(target: Container, toScale: number, ms: number): void {
-    const steps = Math.max(1, Math.round(ms / 16));
-    const from = target.scale.x;
-    const delta = toScale - from;
-    let step = 0;
+  private tweenScale(target: Container, targetScale: number, durationMs: number): void {
+    const totalSteps = Math.max(1, Math.round(durationMs / 16));
+    const startScale = target.scale.x;
+    const scaleDelta = targetScale - startScale;
+    let currentStep = 0;
     const tick = () => {
-      step++;
-      target.scale.set(from + delta * (step / steps));
-      if (step < steps) requestAnimationFrame(tick);
+      currentStep++;
+      target.scale.set(startScale + scaleDelta * (currentStep / totalSteps));
+      if (currentStep < totalSteps) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
   }
 
   private wait(ms: number): Promise<void> {
-    return new Promise((r) => setTimeout(r, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
