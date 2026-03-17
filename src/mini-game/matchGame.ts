@@ -7,6 +7,7 @@ import {
   TextStyle,
   Texture,
 } from "pixi.js";
+import { plantOrAnimal } from "../enums";
 
 interface Match3Options {
   onClose?: (coinsEarned: number) => void;
@@ -71,8 +72,12 @@ interface Layout {
 }
 
 function calculateLayout(screenWidth: number, screenHeight: number): Layout {
-  const tileFromWidth = Math.floor((screenWidth * 0.94 - (COLUMNS - 1) * 4) / COLUMNS);
-  const tileFromHeight = Math.floor((screenHeight * 0.56 - (ROWS - 1) * 4) / ROWS);
+  const tileFromWidth = Math.floor(
+    (screenWidth * 0.94 - (COLUMNS - 1) * 4) / COLUMNS,
+  );
+  const tileFromHeight = Math.floor(
+    (screenHeight * 0.56 - (ROWS - 1) * 4) / ROWS,
+  );
   const tileSize = Math.max(30, Math.min(64, tileFromWidth, tileFromHeight));
   const tileGap = Math.max(3, Math.round(tileSize * 0.08));
   const tileStep = tileSize + tileGap;
@@ -216,8 +221,11 @@ export class Match3MiniGame {
     this.app.stage.addChild(this.rootContainer);
 
     const dimOverlay = new Graphics();
-    dimOverlay.rect(0, 0, screenWidth, screenHeight).fill({ color: 0x000000, alpha: 0.55 });
-    dimOverlay.eventMode = "static";
+    dimOverlay.label = plantOrAnimal.BACKGROUND;
+    dimOverlay
+      .rect(0, 0, screenWidth, screenHeight)
+      .fill({ color: 0x000000, alpha: 0.55 });
+    dimOverlay.eventMode = "dynamic";
     dimOverlay.cursor = "default";
     dimOverlay.on("pointerdown", (event) => event.stopPropagation());
     this.rootContainer.addChild(dimOverlay);
@@ -301,10 +309,17 @@ export class Match3MiniGame {
     const buttonGap = Math.round(layout.padding * 0.4);
     const newButtonWidth = Math.round(layout.boardPixelWidth * 0.38);
     const hintButtonWidth = Math.round(layout.boardPixelWidth * 0.27);
-    const closeButtonWidth = layout.boardPixelWidth - newButtonWidth - hintButtonWidth - buttonGap * 2;
+    const closeButtonWidth =
+      layout.boardPixelWidth - newButtonWidth - hintButtonWidth - buttonGap * 2;
 
-    this.makeButton(layout.padding, layout.buttonY, newButtonWidth, layout.buttonHeight, "🔄 New", 0x2d5a27, () =>
-      this.newGame(),
+    this.makeButton(
+      layout.padding,
+      layout.buttonY,
+      newButtonWidth,
+      layout.buttonHeight,
+      "🔄 New",
+      0x2d5a27,
+      () => this.newGame(),
     );
     this.makeButton(
       layout.padding + newButtonWidth + buttonGap,
@@ -329,13 +344,24 @@ export class Match3MiniGame {
     this.isBuilt = true;
   }
 
-  private makeHudBox(x: number, y: number, labelText: string, valueText: string): Text {
+  private makeHudBox(
+    x: number,
+    y: number,
+    labelText: string,
+    valueText: string,
+  ): Text {
     const layout = this.layout;
+
+    const hudContainer = new Container();
+    hudContainer.x = x;
+    hudContainer.y = y;
+    this.panelContainer.addChild(hudContainer);
+
     const hudBox = new Graphics();
-    hudBox.roundRect(0, 0, layout.hudBoxWidth, layout.hudBoxHeight, 8).fill({ color: 0x2e4a2e });
-    hudBox.x = x;
-    hudBox.y = y;
-    this.panelContainer.addChild(hudBox);
+    hudBox
+      .roundRect(0, 0, layout.hudBoxWidth, layout.hudBoxHeight, 8)
+      .fill({ color: 0x2e4a2e });
+    hudContainer.addChild(hudBox);
 
     const labelDisplay = new Text({
       text: labelText,
@@ -347,7 +373,7 @@ export class Match3MiniGame {
     });
     labelDisplay.x = 5;
     labelDisplay.y = 4;
-    hudBox.addChild(labelDisplay);
+    hudContainer.addChild(labelDisplay);
 
     const valueDisplay = new Text({
       text: valueText,
@@ -360,7 +386,7 @@ export class Match3MiniGame {
     });
     valueDisplay.x = 5;
     valueDisplay.y = layout.hudBoxHeight * 0.44;
-    hudBox.addChild(valueDisplay);
+    hudContainer.addChild(valueDisplay);
 
     return valueDisplay;
   }
@@ -381,7 +407,9 @@ export class Match3MiniGame {
     buttonContainer.cursor = "pointer";
 
     const buttonBackground = new Graphics();
-    buttonBackground.roundRect(0, 0, width, height, 8).fill({ color: backgroundColor });
+    buttonBackground
+      .roundRect(0, 0, width, height, 8)
+      .fill({ color: backgroundColor });
     buttonContainer.addChild(buttonBackground);
 
     const buttonLabel = new Text({
@@ -482,7 +510,8 @@ export class Match3MiniGame {
 
     const resultButtonWidth = Math.round(overlayWidth * 0.38);
     const resultButtonHeight = Math.max(24, Math.round(overlayHeight * 0.22));
-    const resultButtonY = overlayHeight - resultButtonHeight - Math.round(overlayHeight * 0.08);
+    const resultButtonY =
+      overlayHeight - resultButtonHeight - Math.round(overlayHeight * 0.08);
 
     const playAgainButton = this.makeResultButton(
       Math.round(overlayWidth * 0.06),
@@ -529,7 +558,9 @@ export class Match3MiniGame {
     buttonContainer.cursor = "pointer";
 
     const buttonBackground = new Graphics();
-    buttonBackground.roundRect(0, 0, width, height, 8).fill({ color: backgroundColor });
+    buttonBackground
+      .roundRect(0, 0, width, height, 8)
+      .fill({ color: backgroundColor });
     buttonContainer.addChild(buttonBackground);
 
     const buttonLabel = new Text({
@@ -573,7 +604,10 @@ export class Match3MiniGame {
         ),
       );
       attempts++;
-    } while ((this.findMatches().length > 0 || !this.hasValidMove()) && attempts < 200);
+    } while (
+      (this.findMatches().length > 0 || !this.hasValidMove()) &&
+      attempts < 200
+    );
 
     this.renderBoard();
     this.updateHUD();
@@ -634,7 +668,10 @@ export class Match3MiniGame {
     const selectionRing = new Graphics();
     selectionRing
       .roundRect(1, 1, tileSize - 2, tileSize - 2, Math.round(tileSize * 0.18))
-      .stroke({ color: 0xffff00, width: Math.max(2, Math.round(tileSize * 0.05)) });
+      .stroke({
+        color: 0xffff00,
+        width: Math.max(2, Math.round(tileSize * 0.05)),
+      });
     selectionRing.visible = false;
     selectionRing.label = "ring";
     tileContainer.addChild(selectionRing);
@@ -658,7 +695,8 @@ export class Match3MiniGame {
       return;
     }
 
-    const isAdjacent = Math.abs(selectedRow - row) + Math.abs(selectedCol - col) === 1;
+    const isAdjacent =
+      Math.abs(selectedRow - row) + Math.abs(selectedCol - col) === 1;
     if (!isAdjacent) {
       this.deselectAllTiles();
       this.selectTile(row, col);
@@ -673,7 +711,9 @@ export class Match3MiniGame {
     this.selectedTile = { row, col };
     const tile = this.tiles[row]?.[col];
     if (!tile) return;
-    const selectionRing = tile.children.find((child) => child.label === "ring") as Graphics | undefined;
+    const selectionRing = tile.children.find(
+      (child) => child.label === "ring",
+    ) as Graphics | undefined;
     if (selectionRing) selectionRing.visible = true;
     this.tweenScale(tile, 1.12, 80);
   }
@@ -683,7 +723,9 @@ export class Match3MiniGame {
       for (let col = 0; col < COLUMNS; col++) {
         const tile = this.tiles[row]?.[col];
         if (!tile) continue;
-        const selectionRing = tile.children.find((child) => child.label === "ring") as Graphics | undefined;
+        const selectionRing = tile.children.find(
+          (child) => child.label === "ring",
+        ) as Graphics | undefined;
         if (selectionRing) selectionRing.visible = false;
         this.tweenScale(tile, 1.0, 80);
       }
@@ -750,7 +792,12 @@ export class Match3MiniGame {
     }
   }
 
-  private swapBoardData(row1: number, col1: number, row2: number, col2: number): void {
+  private swapBoardData(
+    row1: number,
+    col1: number,
+    row2: number,
+    col2: number,
+  ): void {
     const temporary = this.board[row1][col1];
     this.board[row1][col1] = this.board[row2][col2];
     this.board[row2][col2] = temporary;
@@ -763,10 +810,15 @@ export class Match3MiniGame {
       for (let col = 0; col < COLUMNS - 2; col++) {
         const value = this.board[row][col];
         if (value === null) continue;
-        if (value === this.board[row][col + 1] && value === this.board[row][col + 2]) {
+        if (
+          value === this.board[row][col + 1] &&
+          value === this.board[row][col + 2]
+        ) {
           let endCol = col + 2;
-          while (endCol + 1 < COLUMNS && this.board[row][endCol + 1] === value) endCol++;
-          for (let index = col; index <= endCol; index++) matchedSet.add(row * COLUMNS + index);
+          while (endCol + 1 < COLUMNS && this.board[row][endCol + 1] === value)
+            endCol++;
+          for (let index = col; index <= endCol; index++)
+            matchedSet.add(row * COLUMNS + index);
         }
       }
     }
@@ -775,15 +827,23 @@ export class Match3MiniGame {
       for (let row = 0; row < ROWS - 2; row++) {
         const value = this.board[row][col];
         if (value === null) continue;
-        if (value === this.board[row + 1][col] && value === this.board[row + 2][col]) {
+        if (
+          value === this.board[row + 1][col] &&
+          value === this.board[row + 2][col]
+        ) {
           let endRow = row + 2;
-          while (endRow + 1 < ROWS && this.board[endRow + 1][col] === value) endRow++;
-          for (let index = row; index <= endRow; index++) matchedSet.add(index * COLUMNS + col);
+          while (endRow + 1 < ROWS && this.board[endRow + 1][col] === value)
+            endRow++;
+          for (let index = row; index <= endRow; index++)
+            matchedSet.add(index * COLUMNS + col);
         }
       }
     }
 
-    return [...matchedSet].map((index) => [Math.floor(index / COLUMNS), index % COLUMNS]);
+    return [...matchedSet].map((index) => [
+      Math.floor(index / COLUMNS),
+      index % COLUMNS,
+    ]);
   }
 
   private dropTilesDown(): void {
@@ -792,7 +852,8 @@ export class Match3MiniGame {
       for (let row = ROWS - 1; row >= 0; row--) {
         if (this.board[row][col] !== null) {
           this.board[emptyRow][col] = this.board[row][col];
-          if (emptyRow !== row) this.board[row][col] = null as unknown as number;
+          if (emptyRow !== row)
+            this.board[row][col] = null as unknown as number;
           emptyRow--;
         }
       }
@@ -843,7 +904,10 @@ export class Match3MiniGame {
         ),
       );
       attempts++;
-    } while ((this.findMatches().length > 0 || !this.hasValidMove()) && attempts < 200);
+    } while (
+      (this.findMatches().length > 0 || !this.hasValidMove()) &&
+      attempts < 200
+    );
     this.renderBoard();
   }
 
@@ -856,7 +920,10 @@ export class Match3MiniGame {
           const hasMatch = this.findMatches().length > 0;
           this.swapBoardData(row, col, row, col + 1);
           if (hasMatch) {
-            this.flashHintTiles([[row, col], [row, col + 1]]);
+            this.flashHintTiles([
+              [row, col],
+              [row, col + 1],
+            ]);
             return;
           }
         }
@@ -865,7 +932,10 @@ export class Match3MiniGame {
           const hasMatch = this.findMatches().length > 0;
           this.swapBoardData(row, col, row + 1, col);
           if (hasMatch) {
-            this.flashHintTiles([[row, col], [row + 1, col]]);
+            this.flashHintTiles([
+              [row, col],
+              [row + 1, col],
+            ]);
             return;
           }
         }
@@ -894,7 +964,9 @@ export class Match3MiniGame {
     this.coinsEarned = Math.max(0, Math.floor(this.currentScore / 10));
     this.isResultVisible = true;
     this.updateHUD();
-    this.resultTitleText.text = won ? "🌾 Harvest Complete!" : "💀 Out of Moves!";
+    this.resultTitleText.text = won
+      ? "🌾 Harvest Complete!"
+      : "💀 Out of Moves!";
     this.resultSubText.text = won
       ? `Score: ${this.currentScore}  •  Moves left: ${this.remainingMoves}`
       : `Score: ${this.currentScore}  •  Goal: ${TARGET_SCORE}`;
@@ -905,7 +977,9 @@ export class Match3MiniGame {
 
   private restoreResult(): void {
     this.resultTitleText.text =
-      this.currentScore >= TARGET_SCORE ? "🌾 Harvest Complete!" : "💀 Out of Moves!";
+      this.currentScore >= TARGET_SCORE
+        ? "🌾 Harvest Complete!"
+        : "💀 Out of Moves!";
     this.resultSubText.text =
       this.currentScore >= TARGET_SCORE
         ? `Score: ${this.currentScore}  •  Moves left: ${this.remainingMoves}`
@@ -920,7 +994,13 @@ export class Match3MiniGame {
     this.movesText.text = String(this.remainingMoves);
     this.progressBarFill
       .clear()
-      .roundRect(0, 0, Math.round(this.layout.boardPixelWidth * progressPercent), this.layout.progressBarHeight, 4)
+      .roundRect(
+        0,
+        0,
+        Math.round(this.layout.boardPixelWidth * progressPercent),
+        this.layout.progressBarHeight,
+        4,
+      )
       .fill({ color: 0x4caf50 });
   }
 
@@ -941,8 +1021,10 @@ export class Match3MiniGame {
     const tile2 = this.tiles[row2]?.[col2];
     if (!tile1 || !tile2) return;
 
-    const startX1 = tile1.x, startY1 = tile1.y;
-    const startX2 = tile2.x, startY2 = tile2.y;
+    const startX1 = tile1.x,
+      startY1 = tile1.y;
+    const startX2 = tile2.x,
+      startY2 = tile2.y;
 
     for (let step = 1; step <= 8; step++) {
       const progress = step / 8;
@@ -968,7 +1050,10 @@ export class Match3MiniGame {
 
     for (let step = 1; step <= 8; step++) {
       const progress = step / 8;
-      const scale = Math.max(0, 1 + 0.15 * Math.sin(Math.PI * progress) - progress * 0.4);
+      const scale = Math.max(
+        0,
+        1 + 0.15 * Math.sin(Math.PI * progress) - progress * 0.4,
+      );
       tilesToPop.forEach((tile) => {
         tile.scale.set(scale);
         tile.alpha = 1 - progress * 0.8;
@@ -987,7 +1072,11 @@ export class Match3MiniGame {
     });
   }
 
-  private tweenScale(target: Container, targetScale: number, durationMs: number): void {
+  private tweenScale(
+    target: Container,
+    targetScale: number,
+    durationMs: number,
+  ): void {
     const totalSteps = Math.max(1, Math.round(durationMs / 16));
     const startScale = target.scale.x;
     const scaleDelta = targetScale - startScale;
