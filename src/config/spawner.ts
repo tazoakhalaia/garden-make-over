@@ -15,9 +15,20 @@ import {
 } from "three";
 import type { LoadModels } from "./loadModels";
 
+type BuyObjectType = {
+  type: "CHICKEN" | "COW" | "SHEEP";
+  modelName: "chicken" | "cow" | "sheep";
+  scale: number;
+};
+
 export class Spawner {
   private scene!: Scene;
   private loadModel!: LoadModels;
+  private buyObjects: BuyObjectType[] = [
+    { type: "CHICKEN", modelName: "chicken", scale: 1 },
+    { type: "COW", modelName: "cow", scale: 5 },
+    { type: "SHEEP", modelName: "sheep", scale: 4 },
+  ];
 
   init(scene: Scene, loadModel: LoadModels) {
     this.scene = scene;
@@ -162,23 +173,28 @@ export class Spawner {
       },
     });
   }
-  spawnObjects(x: number, y: number, z: number) {
+
+  spawnObjects(x: number, y: number, z: number, type: string) {
     this.spawnFlash(x, y, z);
     this.spawnShockwave(x, y, z);
     this.spawnBurstParticles(x, y, z);
 
+    const buyObject = this.buyObjects.find((e) => e.type === type);
+    if (!buyObject) return;
+
     const spawnObject = this.loadModel
-      .getModel("farmObjects")
-      .scene.children[2].clone();
+      .getModel(buyObject.modelName)
+      .scene.clone();
 
     spawnObject.scale.set(0, 0, 0);
     spawnObject.position.set(x, y, z);
+    spawnObject.rotation.y = Math.random() * Math.PI * 2;
     this.scene.add(spawnObject);
 
     gsap.to(spawnObject.scale, {
-      x: 3,
-      y: 3,
-      z: 3,
+      x: buyObject.scale,
+      y: buyObject.scale,
+      z: buyObject.scale,
       duration: 0.5,
       delay: 0.1,
       ease: "back.out(1.7)",

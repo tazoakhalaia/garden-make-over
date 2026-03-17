@@ -67,11 +67,11 @@ export class PixiUI {
 
     this.app.renderer.resize(width, height);
 
-    const scaleX = width / this.screenSize.width;
-    const scaleY = height / this.screenSize.height;
+    // const scaleX = width / this.screenSize.width;
+    // const scaleY = height / this.screenSize.height;
 
-    const scale = Math.min(scaleX, scaleY);
+    // const scale = Math.min(scaleX, scaleY);
 
-    this.app.stage.scale.set(scale);
+    // this.app.stage.scale.set(scale);
   };
 }

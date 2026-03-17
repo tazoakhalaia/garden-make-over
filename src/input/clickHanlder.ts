@@ -79,6 +79,7 @@ export class ClickHandler {
         if (this.plantCords) {
           gameEvents.dispatchEvent({
             type: "buyPlant:item-selected",
+            id,
             ...this.plantCords,
           });
         }

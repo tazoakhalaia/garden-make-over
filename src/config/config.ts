@@ -7,6 +7,9 @@ export const config = {
   threeModels: {
     ground: "models/ground.glb",
     farmObjects: "models/objects2.glb",
+    chicken: "models/chicken.glb",
+    sheep: "models/sheep.glb",
+    cow: "models/cow.glb",
   },
 
   placeholderCords: [

@@ -32,6 +32,7 @@ type PlantGroundClickedEvent = {
 
 type PlantMarketChooseEvent = {
   type: "buyPlant:item-selected";
+  id: string;
   x: number;
   y: number;
   z: number;
