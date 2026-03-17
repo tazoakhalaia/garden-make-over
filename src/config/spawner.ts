@@ -16,8 +16,8 @@ import {
 import type { LoadModels } from "./loadModels";
 
 type BuyObjectType = {
-  type: "CHICKEN" | "COW" | "SHEEP";
-  modelName: "chicken" | "cow" | "sheep";
+  type: "CHICKEN" | "COW" | "SHEEP" | "PLANTMARKET";
+  modelName: "chicken" | "cow" | "sheep" | "farmObjects";
   scale: number;
 };
 
@@ -28,6 +28,7 @@ export class Spawner {
     { type: "CHICKEN", modelName: "chicken", scale: 1 },
     { type: "COW", modelName: "cow", scale: 5 },
     { type: "SHEEP", modelName: "sheep", scale: 4 },
+    { type: "PLANTMARKET", modelName: "farmObjects", scale: 4 },
   ];
 
   init(scene: Scene, loadModel: LoadModels) {
@@ -178,13 +179,17 @@ export class Spawner {
     this.spawnFlash(x, y, z);
     this.spawnShockwave(x, y, z);
     this.spawnBurstParticles(x, y, z);
-
+    let spawnObject;
     const buyObject = this.buyObjects.find((e) => e.type === type);
     if (!buyObject) return;
 
-    const spawnObject = this.loadModel
-      .getModel(buyObject.modelName)
-      .scene.clone();
+    if (buyObject.modelName === "farmObjects") {
+      spawnObject = this.loadModel
+        .getModel(buyObject.modelName)
+        .scene.children[2].clone();
+    } else {
+      spawnObject = this.loadModel.getModel(buyObject.modelName).scene.clone();
+    }
 
     spawnObject.scale.set(0, 0, 0);
     spawnObject.position.set(x, y, z);

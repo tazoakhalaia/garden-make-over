@@ -29,6 +29,7 @@ export class GameController {
       this.threeScene.animalFence,
       this.threeScene.plant,
       this.gameEvents,
+      this.threeScene.cameraController,
     );
 
     this.gameEvents.addEventListener("placeholder:clicked", () => {

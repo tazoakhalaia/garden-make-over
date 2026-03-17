@@ -1,11 +1,6 @@
-import {
-  Color,
-  Fog,
-  PerspectiveCamera,
-  Scene,
-  WebGLRenderer
-} from "three";
+import { Color, Fog, PerspectiveCamera, Scene, WebGLRenderer } from "three";
 import { LoadModels, Spawner } from "../config";
+import { CameraControls } from "../controller";
 import { AnimalFence } from "./animalFence";
 import { Ground } from "./Ground";
 import { Lights } from "./lights";
@@ -15,11 +10,12 @@ import { Plant } from "./plant";
 export class ThreeScene {
   private ground = new Ground();
   private loadAllModels = new LoadModels();
+  private lights = new Lights();
   public placeholder = new Placeholder();
   public animalFence = new AnimalFence();
   public plant = new Plant();
   public spawner = new Spawner();
-  private lights = new Lights();
+  public cameraController = new CameraControls();
 
   public scene!: Scene;
   public perspectiveCamera!: PerspectiveCamera;
@@ -50,7 +46,7 @@ export class ThreeScene {
       this.animate();
       this.onResize();
       window.addEventListener("resize", () => this.onResize());
-
+      this.cameraController.init(this.perspectiveCamera, canvas);
       this.ground.init(this.scene, this.loadAllModels);
       this.placeholder.createPlaceholder(this.scene, this.loadAllModels);
       this.animalFence.createFence(this.scene, this.loadAllModels);
@@ -72,6 +68,7 @@ export class ThreeScene {
 
   animate = () => {
     requestAnimationFrame(this.animate);
+    this.cameraController.clamp(-150, 150, -150, 150);
     this.renderer.render(this.scene, this.perspectiveCamera);
   };
 }

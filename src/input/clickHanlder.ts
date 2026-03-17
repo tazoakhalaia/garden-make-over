@@ -1,6 +1,7 @@
 import { Container } from "pixi.js";
 import { PerspectiveCamera, Raycaster, Vector2, type Scene } from "three";
 import type { GameEvents } from "../config/gameEvents";
+import type { CameraControls } from "../controller";
 import { plantOrAnimal } from "../enums";
 import type { AnimalFence, Placeholder } from "../scene";
 import type { Plant } from "../scene/plant";
@@ -45,8 +46,10 @@ export class ClickHandler {
     animalFence: AnimalFence,
     plant: Plant,
     gameEvents: GameEvents,
+    cameraController: CameraControls,
   ) {
     pixiCanvas.addEventListener("pointerup", (e) => {
+      if (cameraController.getHasDragged()) return;
       const id = this.checkClickEvent(uiLayer, e);
       if (id === plantOrAnimal.BACKGROUND) return;
       if (id === plantOrAnimal.PLANT || id === plantOrAnimal.ANIMAL) {
