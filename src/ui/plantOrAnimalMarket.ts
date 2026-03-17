@@ -5,12 +5,15 @@ export class PlantOrAnimalMarket {
   private background!: Graphics;
   private plantContainer = new Container();
   private animalContainer = new Container();
+  private parentContainer!: Container;
 
   private CARD_WIDTH = 280;
   private CARD_HEIGHT = 120;
   private RADIUS = 24;
 
   createFarmMarket(container: Container) {
+    this.parentContainer = container;
+
     this.plantContainer.label = plantOrAnimal.PLANT;
     this.animalContainer.label = plantOrAnimal.ANIMAL;
 
@@ -22,7 +25,10 @@ export class PlantOrAnimalMarket {
     window.addEventListener("resize", this.onResize);
   }
 
-  private onResize = () => this.updateLayout();
+  private onResize = () => {
+    this.renderBackground(this.parentContainer);
+    this.updateLayout();
+  };
 
   renderBackground(container: Container) {
     if (!this.background) {

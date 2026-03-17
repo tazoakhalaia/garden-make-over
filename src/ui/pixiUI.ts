@@ -4,6 +4,7 @@ import { Match3MiniGame } from "../mini-game";
 import { AnimalMarket } from "./animalMarket";
 import { CoinUI } from "./coinUI";
 import { MiniGameBubble } from "./miniGameBubble";
+import { MuteButton } from "./muteButton";
 import { PlantMarket } from "./plantMarket";
 import { PlantOrAnimalMarket } from "./plantOrAnimalMarket";
 
@@ -18,6 +19,7 @@ export class PixiUI {
   public plantMarket = new PlantMarket();
   public match3!: Match3MiniGame;
   private miniGameBubble = new MiniGameBubble();
+  private muteButton = new MuteButton();
 
   private screenSize = config.baseScreenSize;
 
@@ -54,6 +56,7 @@ export class PixiUI {
       });
 
       this.miniGameBubble.create(this.uiLayer, () => this.showMatch3());
+      this.muteButton.create(this.uiLayer);
 
       this.onResize();
       window.addEventListener("resize", this.onResize);
@@ -102,15 +105,16 @@ export class PixiUI {
   onResize = () => {
     const width = window.innerWidth;
     const height = window.innerHeight;
-
     this.app.renderer.resize(width, height);
     this.match3?.resize();
     this.miniGameBubble.reposition();
+    this.muteButton.reposition();
   };
 
   destroy() {
     this.match3?.destroy();
     this.miniGameBubble.destroy();
+    this.muteButton.destroy();
     window.removeEventListener("resize", this.onResize);
   }
 }

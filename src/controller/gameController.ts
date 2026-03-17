@@ -1,4 +1,5 @@
 import { GameEvents } from "../config";
+import { AudioManager } from "../config/audioManager";
 import { ClickHandler } from "../input";
 import { ThreeScene } from "../scene";
 import { PixiUI } from "../ui";
@@ -8,6 +9,7 @@ export class GameController {
   private threeScene = new ThreeScene();
   private clickHandler = new ClickHandler();
   private gameEvents = new GameEvents();
+  private audioManager = new AudioManager();
 
   private _pixiCanvas: HTMLCanvasElement;
   private _threeCanvas: HTMLCanvasElement;
@@ -32,7 +34,14 @@ export class GameController {
       this.threeScene.cameraController,
     );
 
+    const startMusic = () => {
+      this.audioManager.playMusic();
+      window.removeEventListener("pointerdown", startMusic);
+    };
+    window.addEventListener("pointerdown", startMusic);
+
     this.gameEvents.addEventListener("placeholder:clicked", () => {
+      this.audioManager.playSfx("click");
       this.pixiUI.showMarket();
     });
 
@@ -45,21 +54,28 @@ export class GameController {
       },
     );
 
+    this.gameEvents.addEventListener("fence:clicked", () => {
+      this.audioManager.playSfx("click");
+      this.pixiUI.showAnimalMarket();
+    });
+
     this.gameEvents.addEventListener(
       "animalMarket:item-selected",
       ({ x, y, z, id }) => {
         const cost = 100;
         if (!this.pixiUI.coinUI.remove(cost)) return;
+
+        if (id === "CHICKEN") this.audioManager.playAnimal("chicken");
+        else if (id === "SHEEP") this.audioManager.playAnimal("sheep");
+        else if (id === "COW") this.audioManager.playAnimal("cow");
+
         this.threeScene.spawner.spawnObjects(x, y, z, id);
         this.pixiUI.hideAnimalMarket();
       },
     );
 
-    this.gameEvents.addEventListener("fence:clicked", () => {
-      this.pixiUI.showAnimalMarket();
-    });
-
     this.gameEvents.addEventListener("plantGround:clicked", () => {
+      this.audioManager.playSfx("click");
       this.pixiUI.showPlantMarket();
     });
 
