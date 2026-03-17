@@ -1,7 +1,9 @@
 import { Application, Assets, Container } from "pixi.js";
 import { config, type GameEvents } from "../config";
+import { Match3MiniGame } from "../mini-game";
 import { AnimalMarket } from "./animalMarket";
 import { CoinUI } from "./coinUI";
+import { MiniGameBubble } from "./miniGameBubble";
 import { PlantMarket } from "./plantMarket";
 import { PlantOrAnimalMarket } from "./plantOrAnimalMarket";
 
@@ -14,6 +16,8 @@ export class PixiUI {
   public plantOrAnimalMarket = new PlantOrAnimalMarket();
   public animalMarket = new AnimalMarket();
   public plantMarket = new PlantMarket();
+  public match3!: Match3MiniGame;
+  private miniGameBubble = new MiniGameBubble();
 
   private screenSize = config.baseScreenSize;
 
@@ -37,9 +41,32 @@ export class PixiUI {
       this.app.stage.addChild(this.uiLayer);
       this.coinUI.create(this.uiLayer, 500);
 
+      this.match3 = new Match3MiniGame(this.app, {
+        onClose: (coinsEarned: number) => {
+          this.gameEvents.dispatchEvent({ type: "ui:closed" });
+          if (coinsEarned > 0) {
+            this.gameEvents.dispatchEvent({
+              type: "minigame:coins",
+              coins: coinsEarned,
+            });
+          }
+        },
+      });
+
+      this.miniGameBubble.create(this.uiLayer, () => this.showMatch3());
+
       this.onResize();
       window.addEventListener("resize", this.onResize);
     });
+  }
+
+  showMatch3() {
+    this.gameEvents.dispatchEvent({ type: "ui:opened" });
+    this.match3.open();
+  }
+
+  hideMatch3() {
+    this.match3.close(0);
   }
 
   showMarket() {
@@ -75,6 +102,15 @@ export class PixiUI {
   onResize = () => {
     const width = window.innerWidth;
     const height = window.innerHeight;
+
     this.app.renderer.resize(width, height);
+    this.match3?.resize();
+    this.miniGameBubble.reposition();
   };
+
+  destroy() {
+    this.match3?.destroy();
+    this.miniGameBubble.destroy();
+    window.removeEventListener("resize", this.onResize);
+  }
 }

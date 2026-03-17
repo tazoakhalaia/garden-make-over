@@ -46,6 +46,11 @@ type UiClosedEvent = {
   type: "ui:closed";
 };
 
+type MinigameCoinsEvent = {
+  type: "minigame:coins";
+  coins: number;
+};
+
 export type GameEventMap = {
   "placeholder:clicked": PlaceholderClickedEvent;
   "market:item-selected": MarketItemSelectedEvent;
@@ -55,6 +60,7 @@ export type GameEventMap = {
   "buyPlant:item-selected": PlantMarketChooseEvent;
   "ui:opened": UiOpenedEvent;
   "ui:closed": UiClosedEvent;
+  "minigame:coins": MinigameCoinsEvent;
 };
 
 export class GameEvents extends EventDispatcher<GameEventMap> {}
