@@ -69,6 +69,7 @@ export class DayNightToggler {
     this.container = new Container();
     this.container.eventMode = "static";
     this.container.cursor = "pointer";
+    this.container.x = 60
 
     this.drawButton();
 
@@ -118,18 +119,22 @@ export class DayNightToggler {
     this.container.removeChildren();
 
     const SIZE = this.btnSize();
-    const r = SIZE / 2;
+    const calculateSize = SIZE / 2;
 
     const shadow = new Graphics();
-    shadow.circle(r + 2, r + 3, r).fill({ color: 0x000000, alpha: 0.2 });
+    shadow
+      .circle(calculateSize + 2, calculateSize + 3, calculateSize)
+      .fill({ color: 0x000000, alpha: 0.2 });
     this.container.addChild(shadow);
 
     const bg = new Graphics();
-    bg.circle(r, r, r).fill({ color: this.isDay ? 0x38bdf8 : 0x0f172a });
+    bg.circle(calculateSize, calculateSize, calculateSize).fill({
+      color: this.isDay ? 0x38bdf8 : 0x0f172a,
+    });
     this.container.addChild(bg);
 
     const ring = new Graphics();
-    ring.circle(r, r, r - 1).stroke({
+    ring.circle(calculateSize, calculateSize, calculateSize - 1).stroke({
       color: this.isDay ? 0xfbbf24 : 0x6366f1,
       width: Math.max(2, SIZE * 0.05),
     });
@@ -140,8 +145,8 @@ export class DayNightToggler {
       style: new TextStyle({ fontSize: Math.round(SIZE * 0.46) }),
     });
     icon.anchor.set(0.5);
-    icon.x = r;
-    icon.y = r - Math.round(SIZE * 0.04);
+    icon.x = calculateSize;
+    icon.y = calculateSize - Math.round(SIZE * 0.04);
     this.container.addChild(icon);
 
     if (SIZE >= 48) {
@@ -156,8 +161,8 @@ export class DayNightToggler {
         }),
       });
       dayNightLabel.anchor.set(0.5);
-      dayNightLabel.x = r;
-      dayNightLabel.y = r + Math.round(SIZE * 0.28);
+      dayNightLabel.x = calculateSize;
+      dayNightLabel.y = calculateSize + Math.round(SIZE * 0.28);
       this.container.addChild(dayNightLabel);
     }
   }
