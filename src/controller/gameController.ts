@@ -43,12 +43,6 @@ export class GameController {
       this.threeScene.cameraController,
     );
 
-    const startMusic = () => {
-      this.audioManager.playMusic();
-      window.removeEventListener("pointerdown", startMusic);
-    };
-    window.addEventListener("pointerdown", startMusic);
-
     this.gameEvents.addEventListener("placeholder:clicked", () => {
       this.audioManager.playSfx("click");
       this.pixiUI.showMarket();
