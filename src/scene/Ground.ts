@@ -1,4 +1,4 @@
-import { Scene } from "three";
+import { Mesh, Scene } from "three";
 import type { LoadModels } from "../config";
 
 export class Ground {
@@ -10,8 +10,12 @@ export class Ground {
     const ground = loadModels.getModel("ground").scene;
     ground.position.set(0, 0, 0);
     ground.scale.set(8, 6, 6);
-    ground.traverse((e) => {
-      e.name = "ground";
+    ground.traverse((child) => {
+      child.name = "ground";
+      if (child instanceof Mesh) {
+        child.receiveShadow = true;
+        child.castShadow = false;
+      }
     });
     scene.add(ground);
   }

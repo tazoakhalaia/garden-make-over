@@ -1,13 +1,14 @@
 import {
-  AmbientLight,
-  DirectionalLight,
+  Color,
+  Fog,
   PerspectiveCamera,
   Scene,
-  WebGLRenderer,
+  WebGLRenderer
 } from "three";
 import { LoadModels, Spawner } from "../config";
 import { AnimalFence } from "./animalFence";
-import { Ground } from "./ground";
+import { Ground } from "./Ground";
+import { Lights } from "./lights";
 import { Placeholder } from "./placeholder";
 import { Plant } from "./plant";
 
@@ -18,6 +19,7 @@ export class ThreeScene {
   public animalFence = new AnimalFence();
   public plant = new Plant();
   public spawner = new Spawner();
+  private lights = new Lights();
 
   public scene!: Scene;
   public perspectiveCamera!: PerspectiveCamera;
@@ -25,6 +27,9 @@ export class ThreeScene {
 
   async initThree(canvas: HTMLCanvasElement): Promise<void> {
     this.scene = new Scene();
+    this.scene.background = new Color(0x87ceeb);
+    this.scene.fog = new Fog(0x87ceeb, 100, 500);
+
     this.perspectiveCamera = new PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -35,12 +40,13 @@ export class ThreeScene {
     this.perspectiveCamera.lookAt(0, 0, 0);
 
     this.renderer = new WebGLRenderer({ canvas, antialias: true });
-    this.renderer.setClearColor("cyan");
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
+    this.renderer.shadowMap.enabled = true;
+
     await this.loadAllModels.loadAll().then(() => {
-      this.initLights();
+      this.lights.sceneLights(this.scene);
       this.animate();
       this.onResize();
       window.addEventListener("resize", () => this.onResize());
@@ -62,16 +68,6 @@ export class ThreeScene {
 
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(width, height);
-  }
-
-  private initLights() {
-    const ambientLight = new AmbientLight(0xffffff, 0.5);
-
-    const directionalLight = new DirectionalLight(0xffffff, 4);
-    directionalLight.position.set(10, 20, 10);
-    directionalLight.castShadow = true;
-
-    this.scene.add(ambientLight, directionalLight);
   }
 
   animate = () => {
