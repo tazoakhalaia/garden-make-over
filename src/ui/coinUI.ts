@@ -35,10 +35,10 @@ export class CoinUI {
       .fill({ color: 0xf59e0b });
 
     const coinSymbol = new Text({
-      text: "₿",
+      text: "$",
       style: new TextStyle({
         fill: "#7c3f00",
-        fontSize: 16,
+        fontSize: 18,
         fontFamily: "LuckiestGuy Regular",
       }),
     });

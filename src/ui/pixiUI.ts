@@ -41,7 +41,7 @@ export class PixiUI {
       this.uiLayer.eventMode = "static";
       this.uiLayer.interactiveChildren = true;
       this.app.stage.addChild(this.uiLayer);
-      this.coinUI.create(this.uiLayer, 500);
+      this.coinUI.create(this.uiLayer, 2000);
 
       this.match3 = new Match3MiniGame(this.app, {
         onClose: (coinsEarned: number) => {
