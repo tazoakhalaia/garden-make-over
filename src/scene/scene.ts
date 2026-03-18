@@ -9,7 +9,7 @@ import { Plant } from "./plant";
 
 export class ThreeScene {
   private ground = new Ground();
-  private loadAllModels = new LoadModels();
+  public loadAllModels = new LoadModels();
   public lights = new Lights();
   public placeholder = new Placeholder();
   public animalFence = new AnimalFence();

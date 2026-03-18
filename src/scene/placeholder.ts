@@ -61,6 +61,32 @@ export class Placeholder {
     );
   }
 
+  restorePlaceholder(x: number, y: number, z: number, loadModel: LoadModels) {
+    const originalModel = loadModel.getModel("farmObjects").scene.children[0];
+
+    const placeholderGroup = new Group();
+
+    const placeholder = new BoxGeometry(80, 40, 10);
+    const placeholderColor = new MeshBasicMaterial({
+      color: "green",
+      transparent: true,
+      opacity: 0,
+    });
+    const placeholderMesh = new Mesh(placeholder, placeholderColor);
+    placeholderMesh.rotation.x = Math.PI / 2;
+    placeholderMesh.name = `placeholder_restored`;
+
+    const placeholderModel = originalModel.clone();
+    placeholderModel.rotation.y = Math.PI / 2;
+    placeholderModel.scale.set(6, 6, 7);
+    placeholderModel.position.set(0, 5, 0);
+
+    placeholderGroup.position.set(x, y, z);
+    placeholderGroup.add(placeholderMesh, placeholderModel);
+    this.storePlaceholders.push(placeholderGroup);
+    this.scene.add(placeholderGroup);
+  }
+
   getPlaceholders(): Object3D[] {
     return this.storePlaceholders.flatMap((g) => {
       const allModel: Object3D[] = [];

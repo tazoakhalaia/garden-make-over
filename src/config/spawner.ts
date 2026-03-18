@@ -6,6 +6,7 @@ import {
   DoubleSide,
   Mesh,
   MeshBasicMaterial,
+  Object3D,
   Points,
   PointsMaterial,
   RingGeometry,
@@ -24,6 +25,7 @@ type BuyObjectType = {
 export class Spawner {
   private scene!: Scene;
   private loadModel!: LoadModels;
+  private spawnedAnimals: Object3D[] = [];
   private buyObjects: BuyObjectType[] = [
     { type: "CHICKEN", modelName: "chicken", scale: 1 },
     { type: "COW", modelName: "cow", scale: 5 },
@@ -34,6 +36,15 @@ export class Spawner {
   init(scene: Scene, loadModel: LoadModels) {
     this.scene = scene;
     this.loadModel = loadModel;
+  }
+
+  getSpawnedAnimals(): Object3D[] {
+    return this.spawnedAnimals;
+  }
+
+  removeAnimal(animal: Object3D) {
+    this.scene.remove(animal);
+    this.spawnedAnimals = this.spawnedAnimals.filter((a) => a !== animal);
   }
 
   private spawnBurstParticles(x: number, y: number, z: number) {
@@ -179,10 +190,11 @@ export class Spawner {
     this.spawnFlash(x, y, z);
     this.spawnShockwave(x, y, z);
     this.spawnBurstParticles(x, y, z);
-    let spawnObject;
+
     const buyObject = this.buyObjects.find((e) => e.type === type);
     if (!buyObject) return;
 
+    let spawnObject;
     if (buyObject.modelName === "farmObjects") {
       spawnObject = this.loadModel
         .getModel(buyObject.modelName)
@@ -195,6 +207,7 @@ export class Spawner {
     spawnObject.position.set(x, y, z);
     spawnObject.rotation.y = Math.random() * Math.PI * 2;
     this.scene.add(spawnObject);
+    this.spawnedAnimals.push(spawnObject);
 
     gsap.to(spawnObject.scale, {
       x: buyObject.scale,

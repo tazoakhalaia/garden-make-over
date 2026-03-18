@@ -1,4 +1,5 @@
 import { Container, Graphics, Text } from "pixi.js";
+import type { GameEvents } from "../config";
 import { plantOrAnimal } from "../enums";
 
 interface AnimalData {
@@ -13,6 +14,7 @@ interface AnimalData {
 export class AnimalMarket {
   private animalContainer = new Container();
   private parentContainer!: Container;
+  private gameEvents!: GameEvents;
 
   private animals: AnimalData[] = [
     {
@@ -45,12 +47,12 @@ export class AnimalMarket {
   private readonly BASE_CARD_H = 270;
   private readonly GAP = 22;
 
-  createAnimalMarket(container: Container) {
+  createAnimalMarket(container: Container, gameEvents: GameEvents) {
     this.parentContainer = container;
+    this.gameEvents = gameEvents;
     this.updateLayout();
     window.addEventListener("resize", this.onResize);
   }
-
   private onResize = () => this.updateLayout();
 
   private updateLayout() {
@@ -95,6 +97,45 @@ export class AnimalMarket {
     cardsWrap.y = 65;
     cardsWrap.x = isPortrait ? -this.BASE_CARD_W / 2 : -(cardsWrap.width / 2);
     content.addChild(cardsWrap);
+
+    const sellBtnW = isPortrait ? this.BASE_CARD_W : cardsWrap.width;
+    const sellBtnH = 48;
+    const sellBtnGap = 16;
+
+    const sellBg = new Graphics()
+      .roundRect(0, 0, sellBtnW, sellBtnH, 12)
+      .fill({ color: 0xb71c1c })
+      .roundRect(3, 3, sellBtnW - 6, sellBtnH - 6, 10)
+      .fill({ color: 0xe53935 });
+
+    const sellLabel = new Text({
+      text: "💰 SELL FENCE",
+      style: {
+        fontFamily: "LuckiestGuy Regular",
+        fontSize: 20,
+        fill: "#ffffff",
+      },
+    });
+    sellLabel.anchor.set(0.5);
+    sellLabel.x = sellBtnW / 2;
+    sellLabel.y = sellBtnH / 2;
+
+    const sellBtn = new Container();
+    sellBtn.addChild(sellBg, sellLabel);
+    sellBtn.eventMode = "static";
+    sellBtn.cursor = "pointer";
+    sellBtn.x = isPortrait ? -this.BASE_CARD_W / 2 : -(cardsWrap.width / 2);
+    sellBtn.y = cardsWrap.y + cardsWrap.height + sellBtnGap;
+
+    sellBtn.on("pointerover", () => sellBtn.scale.set(1.03));
+    sellBtn.on("pointerout", () => sellBtn.scale.set(1.0));
+    sellBtn.on("pointerdown", () => sellBtn.scale.set(0.97));
+    sellBtn.on("pointerup", () => {
+      sellBtn.scale.set(1.0);
+      this.gameEvents.dispatchEvent({ type: "sell-fence" });
+    });
+
+    content.addChild(sellBtn);
 
     const padding = 45;
     const panelW = content.width + padding * 2;

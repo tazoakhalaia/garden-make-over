@@ -84,7 +84,7 @@ export class PixiUI {
 
   showAnimalMarket() {
     this.gameEvents.dispatchEvent({ type: "ui:opened" });
-    this.animalMarket.createAnimalMarket(this.uiLayer);
+    this.animalMarket.createAnimalMarket(this.uiLayer, this.gameEvents);
   }
 
   hideAnimalMarket() {

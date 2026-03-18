@@ -1,3 +1,4 @@
+import type { Mesh } from "three";
 import { GameEvents } from "../config";
 import { AudioManager } from "../config/audioManager";
 import { ClickHandler } from "../input";
@@ -11,6 +12,9 @@ export class GameController {
   private gameEvents = new GameEvents();
   private audioManager = new AudioManager();
   private progressBar = new ProgressBar();
+  private lastClickedFenceHitBox: Mesh | null = null;
+  private lastClickedFencePosition: { x: number; y: number; z: number } | null =
+    null;
 
   private _pixiCanvas: HTMLCanvasElement;
   private _threeCanvas: HTMLCanvasElement;
@@ -60,7 +64,13 @@ export class GameController {
       },
     );
 
-    this.gameEvents.addEventListener("fence:clicked", () => {
+    this.gameEvents.addEventListener("fence:clicked", ({ hitBox }) => {
+      this.lastClickedFenceHitBox = hitBox;
+      this.lastClickedFencePosition = {
+        x: hitBox.position.x,
+        y: hitBox.position.y - 2,
+        z: hitBox.position.z,
+      };
       this.audioManager.playSfx("click");
       this.pixiUI.showAnimalMarket();
     });
@@ -97,6 +107,29 @@ export class GameController {
 
     this.gameEvents.addEventListener("minigame:coins", ({ coins }) => {
       this.pixiUI.coinUI.add(coins);
+    });
+
+    this.gameEvents.addEventListener("sell-fence", () => {
+      if (!this.lastClickedFenceHitBox || !this.lastClickedFencePosition)
+        return;
+
+      this.threeScene.animalFence.sellFence(
+        this.lastClickedFenceHitBox,
+        this.threeScene.spawner.getSpawnedAnimals(),
+      );
+
+      const { x, y, z } = this.lastClickedFencePosition;
+      this.threeScene.placeholder.restorePlaceholder(
+        x,
+        y,
+        z,
+        this.threeScene.loadAllModels,
+      );
+
+      this.pixiUI.coinUI.add(500);
+      this.pixiUI.hideAnimalMarket();
+      this.lastClickedFenceHitBox = null;
+      this.lastClickedFencePosition = null;
     });
   }
 }

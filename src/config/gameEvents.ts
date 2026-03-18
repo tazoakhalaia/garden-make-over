@@ -1,4 +1,4 @@
-import { EventDispatcher } from "three";
+import { EventDispatcher, Mesh } from "three";
 
 type PlaceholderClickedEvent = {
   type: "placeholder:clicked";
@@ -16,6 +16,7 @@ type MarketItemSelectedEvent = {
 
 type FenceClickedEvent = {
   type: "fence:clicked";
+  hitBox: Mesh;
 };
 
 type AnimaMarketClickedEvent = {
@@ -51,6 +52,10 @@ type MinigameCoinsEvent = {
   coins: number;
 };
 
+type SellFenceEvent = {
+  type: "sell-fence";
+};
+
 export type GameEventMap = {
   "placeholder:clicked": PlaceholderClickedEvent;
   "market:item-selected": MarketItemSelectedEvent;
@@ -61,6 +66,7 @@ export type GameEventMap = {
   "ui:opened": UiOpenedEvent;
   "ui:closed": UiClosedEvent;
   "minigame:coins": MinigameCoinsEvent;
+  "sell-fence": SellFenceEvent;
 };
 
 export class GameEvents extends EventDispatcher<GameEventMap> {}
