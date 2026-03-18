@@ -23,15 +23,21 @@ class App {
 
     loader.setProgress(0.05);
 
-    let fakeP = 0.05;
-    const ticker = setInterval(() => {
-      fakeP = Math.min(fakeP + 0.015, 0.85);
-      loader.setProgress(fakeP);
-    }, 120);
+    let fakeProgress = 0.05;
+    let animationFrameId: number;
+
+    const tick = () => {
+      fakeProgress = Math.min(fakeProgress + 0.015, 0.85);
+      loader.setProgress(fakeProgress);
+      if (fakeProgress < 0.85) {
+        animationFrameId = requestAnimationFrame(tick);
+      }
+    };
+    animationFrameId = requestAnimationFrame(tick);
 
     await this.gameController.init();
 
-    clearInterval(ticker);
+    cancelAnimationFrame(animationFrameId);
     loader.setProgress(1.0);
 
     await this.wait(400);

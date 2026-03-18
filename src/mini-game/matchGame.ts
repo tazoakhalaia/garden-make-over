@@ -926,19 +926,24 @@ export class Match3MiniGame {
 
   private flashHintTiles(cells: [number, number][]): void {
     let flashCount = 0;
-    const flashInterval = setInterval(() => {
+
+    const doFlash = () => {
       cells.forEach(([row, col]) => {
         const tile = this.tiles[row]?.[col];
         if (tile) tile.alpha = tile.alpha > 0.6 ? 0.35 : 1.0;
       });
-      if (++flashCount >= 6) {
-        clearInterval(flashInterval);
+      flashCount++;
+      if (flashCount < 6) {
+        gsap.delayedCall(0.15, doFlash);
+      } else {
         cells.forEach(([row, col]) => {
           const tile = this.tiles[row]?.[col];
           if (tile) tile.alpha = 1.0;
         });
       }
-    }, 150);
+    };
+
+    doFlash();
   }
 
   private showResult(won: boolean): void {
