@@ -193,12 +193,13 @@ export class Spawner {
 
     const buyObject = this.buyObjects.find((e) => e.type === type);
     if (!buyObject) return;
-
+    const plantIndexes = [3, 10, 13, 16];
     let spawnObject;
     if (buyObject.modelName === "farmObjects") {
+      const randomIndex = Math.floor(Math.random() * plantIndexes.length);
       spawnObject = this.loadModel
         .getModel(buyObject.modelName)
-        .scene.children[2].clone();
+        .scene.children[plantIndexes[randomIndex]].clone();
     } else {
       spawnObject = this.loadModel.getModel(buyObject.modelName).scene.clone();
     }
