@@ -10,6 +10,7 @@ export const config = {
     chicken: "models/chicken.glb",
     sheep: "models/sheep.glb",
     cow: "models/cow.glb",
+    wolf: "models/wolf_sheep.glb",
   },
 
   sounds: {

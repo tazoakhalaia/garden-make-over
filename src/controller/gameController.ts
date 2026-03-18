@@ -3,7 +3,7 @@ import { GameEvents } from "../config";
 import { AudioManager } from "../config/audioManager";
 import { ClickHandler } from "../input";
 import { ThreeScene } from "../scene";
-import { PixiUI, ProgressBar } from "../ui";
+import { PixiUI } from "../ui";
 
 export class GameController {
   private pixiUI = new PixiUI();
@@ -11,10 +11,10 @@ export class GameController {
   private clickHandler = new ClickHandler();
   private gameEvents = new GameEvents();
   private audioManager = new AudioManager();
-  private progressBar = new ProgressBar();
   private lastClickedFenceHitBox: Mesh | null = null;
   private lastClickedFencePosition: { x: number; y: number; z: number } | null =
     null;
+  private lastClickedPlantHitBox: Mesh | null = null;
 
   private _pixiCanvas: HTMLCanvasElement;
   private _threeCanvas: HTMLCanvasElement;
@@ -36,8 +36,12 @@ export class GameController {
     );
 
     this.pixiUI.initPixi(this._pixiCanvas, this.gameEvents);
+
     this.pixiUI.threeSnowToggle = () => this.threeScene.snow.toggle();
-    this.progressBar.init(this.pixiUI.uiLayer, this.gameEvents);
+    this.pixiUI.onWolfCoinDrain = () => this.pixiUI.coinUI.remove(10);
+    this.pixiUI.onReady = () => {
+      this.threeScene.wolfManager.startFirstCountdown();
+    };
 
     this.clickHandler.setupClickHandler(
       this._pixiCanvas,
@@ -49,6 +53,7 @@ export class GameController {
       this.threeScene.plant,
       this.gameEvents,
       this.threeScene.cameraController,
+      this.threeScene.wolfManager,
     );
 
     this.gameEvents.addEventListener("placeholder:clicked", ({ x, y, z }) => {
@@ -103,6 +108,7 @@ export class GameController {
       ({ x, y, z, id }) => {
         const cost = 50;
         if (!this.pixiUI.coinUI.remove(cost)) return;
+
         this.threeScene.spawner.spawnObjects(x, y, z, id);
         this.pixiUI.hidePlantMarket();
       },

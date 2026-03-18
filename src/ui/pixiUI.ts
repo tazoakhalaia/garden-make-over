@@ -7,6 +7,8 @@ import { DayNightToggler } from "./dayNightToggler";
 import { MiniGameBubble } from "./miniGameBubble";
 import { PlantMarket } from "./plantMarket";
 import { PlantOrAnimalMarket } from "./plantOrAnimalMarket";
+import { ProgressBar } from "./progressBar";
+import { WolfWarningUI } from "./wolfWarningUI";
 
 export class PixiUI {
   private app = new Application();
@@ -20,7 +22,12 @@ export class PixiUI {
   public match3!: Match3MiniGame;
   private miniGameBubble = new MiniGameBubble();
   public dayNight = new DayNightToggler();
+  private progressBar = new ProgressBar();
+  private wolfWarningUI = new WolfWarningUI();
+
   public threeSnowToggle: (() => void) | null = null;
+  public onWolfCoinDrain: (() => void) | null = null;
+  public onReady: (() => void) | null = null;
 
   private screenSize = config.baseScreenSize;
 
@@ -42,6 +49,7 @@ export class PixiUI {
       this.uiLayer.eventMode = "static";
       this.uiLayer.interactiveChildren = true;
       this.app.stage.addChild(this.uiLayer);
+
       this.coinUI.create(this.uiLayer, 2000);
 
       this.match3 = new Match3MiniGame(this.uiLayer, {
@@ -61,10 +69,16 @@ export class PixiUI {
         () => this.showMatch3(),
         () => this.threeSnowToggle?.(),
       );
+
       this.dayNight.create(this.uiLayer);
+      this.progressBar.init(this.uiLayer, this.gameEvents);
+      this.wolfWarningUI.init(this.uiLayer, this.gameEvents, () =>
+        this.onWolfCoinDrain?.(),
+      );
 
       this.onResize();
       window.addEventListener("resize", this.onResize);
+      this.onReady?.();
     });
   }
 
@@ -119,6 +133,8 @@ export class PixiUI {
     this.match3?.destroy();
     this.miniGameBubble.destroy();
     this.dayNight.destroy();
+    this.progressBar.destroy();
+    this.wolfWarningUI.destroy();
     window.removeEventListener("resize", this.onResize);
   }
 }

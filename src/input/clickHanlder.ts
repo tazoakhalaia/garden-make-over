@@ -11,6 +11,7 @@ import type { CameraControls } from "../controller";
 import { plantOrAnimal } from "../enums";
 import type { AnimalFence, Placeholder } from "../scene";
 import type { Plant } from "../scene/plant";
+import type { WolfManager } from "../scene/wolf";
 
 export class ClickHandler {
   private raycaster = new Raycaster();
@@ -53,6 +54,7 @@ export class ClickHandler {
     plant: Plant,
     gameEvents: GameEvents,
     cameraController: CameraControls,
+    wolfManager: WolfManager,
   ) {
     pixiCanvas.addEventListener("pointerup", (e) => {
       if (cameraController.getHasDragged()) return;
@@ -104,7 +106,16 @@ export class ClickHandler {
       const intersects = this.raycaster.intersectObjects(scene.children, true);
 
       if (intersects.length > 0) {
-        const hit = intersects[0].object;
+        const hit = intersects[0].object as any;
+
+        const clickedWolfHitBox = wolfManager
+          .getHitBoxes()
+          .find((box) => box === hit);
+
+        if (clickedWolfHitBox) {
+          wolfManager.hitWolf(clickedWolfHitBox);
+          return;
+        }
 
         const isPlaceholder = placeholder.getPlaceholders().includes(hit);
         if (isPlaceholder) {
@@ -112,6 +123,7 @@ export class ClickHandler {
           placeholder.removePlaceholder(hit);
           this.pendingCoords = { x, y, z };
           gameEvents.dispatchEvent({ type: "placeholder:clicked", x, y, z });
+          return;
         }
 
         const clickedFenceIndex = animalFence
@@ -140,7 +152,9 @@ export class ClickHandler {
             y: worldPosition.y,
             z: worldPosition.z,
           };
-          gameEvents.dispatchEvent({ type: "plantGround:clicked" });
+          gameEvents.dispatchEvent({
+            type: "plantGround:clicked",
+          });
           return;
         }
       }

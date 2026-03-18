@@ -56,6 +56,13 @@ type SellFenceEvent = {
   type: "sell-fence";
 };
 
+type WolfCountdownStartEvent = {
+  type: "wolf:countdown-start";
+  seconds: number;
+};
+type WolfWaveStartEvent = { type: "wolf:wave-start" };
+type WolfWaveEndEvent = { type: "wolf:wave-end" };
+
 export type GameEventMap = {
   "placeholder:clicked": PlaceholderClickedEvent;
   "market:item-selected": MarketItemSelectedEvent;
@@ -67,6 +74,9 @@ export type GameEventMap = {
   "ui:closed": UiClosedEvent;
   "minigame:coins": MinigameCoinsEvent;
   "sell-fence": SellFenceEvent;
+  "wolf:countdown-start": WolfCountdownStartEvent;
+  "wolf:wave-start": WolfWaveStartEvent;
+  "wolf:wave-end": WolfWaveEndEvent;
 };
 
 export class GameEvents extends EventDispatcher<GameEventMap> {}

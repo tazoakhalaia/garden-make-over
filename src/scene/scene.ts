@@ -7,6 +7,7 @@ import { Lights } from "./lights";
 import { Placeholder } from "./placeholder";
 import { Plant } from "./plant";
 import { Snow } from "./snow";
+import { WolfManager } from "./wolf";
 
 export class ThreeScene {
   private ground = new Ground();
@@ -18,6 +19,7 @@ export class ThreeScene {
   public spawner = new Spawner();
   public cameraController = new CameraControls();
   public snow = new Snow();
+  public wolfManager = new WolfManager();
 
   public scene!: Scene;
   public perspectiveCamera!: PerspectiveCamera;
@@ -57,6 +59,7 @@ export class ThreeScene {
       this.plant.createPlant(this.scene, this.loadAllModels);
       this.spawner.init(this.scene, this.loadAllModels);
       this.snow.init(this.scene);
+      this.wolfManager.init(this.scene, this.loadAllModels, gameEvents);
     });
   }
 
