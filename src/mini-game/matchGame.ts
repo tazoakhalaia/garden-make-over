@@ -1,12 +1,4 @@
-import {
-  Application,
-  Container,
-  Graphics,
-  Sprite,
-  Text,
-  TextStyle,
-  Texture,
-} from "pixi.js";
+import { Container, Graphics, Sprite, Text, TextStyle, Texture } from "pixi.js";
 import { plantOrAnimal } from "../enums";
 
 interface Match3Options {
@@ -133,7 +125,7 @@ function calculateLayout(screenWidth: number, screenHeight: number): Layout {
 }
 
 export class Match3MiniGame {
-  private app: Application;
+  private uiLayer: Container;
   private options: Match3Options;
 
   private rootContainer!: Container;
@@ -163,8 +155,8 @@ export class Match3MiniGame {
   private savedMessageColor = 0xaad4aa;
   private isResultVisible = false;
 
-  constructor(app: Application, options: Match3Options = {}) {
-    this.app = app;
+  constructor(uiLayer: Container, options: Match3Options = {}) {
+    this.uiLayer = uiLayer;
     this.options = options;
   }
 
@@ -172,15 +164,15 @@ export class Match3MiniGame {
     this.isOpen = true;
     this.rebuild();
     this.rootContainer.visible = true;
+    this.rootContainer.eventMode = "static";
+    this.rootContainer.interactiveChildren = true;
     this.newGame();
   }
-
   close(coinsEarned = 0): void {
     this.isOpen = false;
-    if (this.rootContainer) this.rootContainer.visible = false;
+    this.destroy();
     this.options.onClose?.(coinsEarned);
   }
-
   resize(): void {
     if (!this.isOpen) return;
     this.rebuild();
@@ -193,21 +185,19 @@ export class Match3MiniGame {
 
   destroy(): void {
     if (this.rootContainer) {
-      this.app.stage.removeChild(this.rootContainer);
+      this.rootContainer.eventMode = "none";
+      this.rootContainer.interactiveChildren = false;
+      this.rootContainer.visible = false;
+      this.uiLayer.removeChild(this.rootContainer);
       this.rootContainer.destroy({ children: true });
+      this.rootContainer = null!;
       this.isBuilt = false;
     }
   }
-
   private rebuild(): void {
-    if (this.isBuilt) {
-      this.app.stage.removeChild(this.rootContainer);
-      this.rootContainer.destroy({ children: true });
-      this.isBuilt = false;
-    }
+    this.destroy();
     this.build();
   }
-
   private build(): void {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
@@ -218,14 +208,13 @@ export class Match3MiniGame {
     this.rootContainer.visible = false;
     this.rootContainer.eventMode = "static";
     this.rootContainer.interactiveChildren = true;
-    this.app.stage.addChild(this.rootContainer);
+    this.uiLayer.addChild(this.rootContainer);
 
     const dimOverlay = new Graphics();
     dimOverlay.label = plantOrAnimal.BACKGROUND;
     dimOverlay
       .rect(0, 0, screenWidth, screenHeight)
       .fill({ color: 0x000000, alpha: 0.2 });
-    dimOverlay.label = plantOrAnimal.BACKGROUND;
     this.rootContainer.addChild(dimOverlay);
 
     const panelBackground = new Graphics();
