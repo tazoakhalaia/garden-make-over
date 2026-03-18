@@ -30,11 +30,9 @@ export class MiniGameBubble {
     this.container.addChild(icon);
 
     const label = new Text({
-      text: "PLAY",
+      text: "EARNING",
       style: new TextStyle({
-        fontFamily: "LuckiestGuy Regular",
-        fontSize: 9,
-        fontWeight: "bold",
+        fontSize: 8,
         fill: 0xaad4aa,
         letterSpacing: 1,
       }),
@@ -45,7 +43,7 @@ export class MiniGameBubble {
     this.container.addChild(label);
 
     this.container.x = 20;
-    this.container.y = window.innerHeight - 90;
+    this.container.y = 90;
 
     this.container.on("pointerdown", () => {
       this.container!.scale.set(0.9);
@@ -61,11 +59,6 @@ export class MiniGameBubble {
     parent.addChild(this.container);
   }
 
-  reposition() {
-    if (this.container) {
-      this.container.y = window.innerHeight - 90;
-    }
-  }
 
   destroy() {
     if (this.container) {

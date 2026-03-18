@@ -155,7 +155,6 @@ export class DayNightToggler {
         style: new TextStyle({
           fontFamily: "Arial",
           fontSize: Math.max(7, Math.round(SIZE * 0.16)),
-          fontWeight: "bold",
           fill: this.isDay ? 0xfef9c3 : 0xc7d2fe,
           letterSpacing: 0.5,
         }),

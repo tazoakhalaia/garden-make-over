@@ -149,7 +149,6 @@ export class PlantMarket {
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
         fontSize: titleFs,
-        fontWeight: "bold",
         fill: 0xdcfce7,
         letterSpacing: Math.round(3 * s),
         dropShadow: {

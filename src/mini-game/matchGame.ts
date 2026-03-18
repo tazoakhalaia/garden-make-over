@@ -1,4 +1,12 @@
-import { Container, Graphics, Sprite, Text, TextStyle, Texture } from "pixi.js";
+import {
+  Application,
+  Container,
+  Graphics,
+  Sprite,
+  Text,
+  TextStyle,
+  Texture,
+} from "pixi.js";
 import { plantOrAnimal } from "../enums";
 
 interface Match3Options {
@@ -125,7 +133,7 @@ function calculateLayout(screenWidth: number, screenHeight: number): Layout {
 }
 
 export class Match3MiniGame {
-  private app: Container;
+  private app: Application;
   private options: Match3Options;
 
   private rootContainer!: Container;
@@ -155,7 +163,7 @@ export class Match3MiniGame {
   private savedMessageColor = 0xaad4aa;
   private isResultVisible = false;
 
-  constructor(app: Container, options: Match3Options = {}) {
+  constructor(app: Application, options: Match3Options = {}) {
     this.app = app;
     this.options = options;
   }
@@ -185,7 +193,7 @@ export class Match3MiniGame {
 
   destroy(): void {
     if (this.rootContainer) {
-      this.app.removeChild(this.rootContainer);
+      this.app.stage.removeChild(this.rootContainer);
       this.rootContainer.destroy({ children: true });
       this.isBuilt = false;
     }
@@ -193,7 +201,7 @@ export class Match3MiniGame {
 
   private rebuild(): void {
     if (this.isBuilt) {
-      this.app.removeChild(this.rootContainer);
+      this.app.stage.removeChild(this.rootContainer);
       this.rootContainer.destroy({ children: true });
       this.isBuilt = false;
     }
@@ -210,7 +218,7 @@ export class Match3MiniGame {
     this.rootContainer.visible = false;
     this.rootContainer.eventMode = "static";
     this.rootContainer.interactiveChildren = true;
-    this.app.addChild(this.rootContainer);
+    this.app.stage.addChild(this.rootContainer);
 
     const dimOverlay = new Graphics();
     dimOverlay.label = plantOrAnimal.BACKGROUND;
@@ -237,7 +245,6 @@ export class Match3MiniGame {
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
         fontSize: layout.fontSizes.title,
-        fontWeight: "bold",
         fill: 0xffe066,
       }),
     });
@@ -370,7 +377,6 @@ export class Match3MiniGame {
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
         fontSize: layout.fontSizes.hudValue,
-        fontWeight: "bold",
         fill: 0xffffff,
       }),
     });
@@ -407,7 +413,6 @@ export class Match3MiniGame {
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
         fontSize: this.layout.fontSizes.button,
-        fontWeight: "bold",
         fill: 0xffffff,
       }),
     });
@@ -459,7 +464,6 @@ export class Match3MiniGame {
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
         fontSize: titleFontSize,
-        fontWeight: "bold",
         fill: 0xffe066,
         align: "center",
       }),
@@ -488,7 +492,6 @@ export class Match3MiniGame {
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
         fontSize: coinsFontSize,
-        fontWeight: "bold",
         fill: 0xffd700,
         align: "center",
       }),
@@ -558,7 +561,6 @@ export class Match3MiniGame {
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
         fontSize: fontSize,
-        fontWeight: "bold",
         fill: 0xffffff,
       }),
     });

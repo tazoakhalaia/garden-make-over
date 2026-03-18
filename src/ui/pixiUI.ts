@@ -43,7 +43,7 @@ export class PixiUI {
       this.app.stage.addChild(this.uiLayer);
       this.coinUI.create(this.uiLayer, 2000);
 
-      this.match3 = new Match3MiniGame(this.uiLayer, {
+      this.match3 = new Match3MiniGame(this.app, {
         onClose: (coinsEarned: number) => {
           this.gameEvents.dispatchEvent({ type: "ui:closed" });
           if (coinsEarned > 0) {
@@ -107,7 +107,6 @@ export class PixiUI {
     const height = window.innerHeight;
     this.app.renderer.resize(width, height);
     this.match3?.resize();
-    this.miniGameBubble.reposition();
     this.dayNight.reposition();
   };
 
