@@ -2,7 +2,7 @@ import { GameEvents } from "../config";
 import { AudioManager } from "../config/audioManager";
 import { ClickHandler } from "../input";
 import { ThreeScene } from "../scene";
-import { PixiUI } from "../ui";
+import { PixiUI, ProgressBar } from "../ui";
 
 export class GameController {
   private pixiUI = new PixiUI();
@@ -10,6 +10,7 @@ export class GameController {
   private clickHandler = new ClickHandler();
   private gameEvents = new GameEvents();
   private audioManager = new AudioManager();
+  private progressBar = new ProgressBar();
 
   private _pixiCanvas: HTMLCanvasElement;
   private _threeCanvas: HTMLCanvasElement;
@@ -31,6 +32,8 @@ export class GameController {
     );
 
     this.pixiUI.initPixi(this._pixiCanvas, this.gameEvents);
+    this.progressBar.init(this.pixiUI.uiLayer, this.gameEvents);
+
     this.clickHandler.setupClickHandler(
       this._pixiCanvas,
       this.threeScene.perspectiveCamera,
