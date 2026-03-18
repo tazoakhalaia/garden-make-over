@@ -1,5 +1,11 @@
 import { Container } from "pixi.js";
-import { PerspectiveCamera, Raycaster, Vector2, type Scene } from "three";
+import {
+  PerspectiveCamera,
+  Raycaster,
+  Vector2,
+  Vector3,
+  type Scene,
+} from "three";
 import type { GameEvents } from "../config/gameEvents";
 import type { CameraControls } from "../controller";
 import { plantOrAnimal } from "../enums";
@@ -113,19 +119,25 @@ export class ClickHandler {
           .findIndex((box) => box === hit);
 
         if (clickedFenceIndex !== -1) {
-          const { x, y, z } = intersects[0].point;
+          const { x, y, z } =
+            animalFence.getHitBoxes()[clickedFenceIndex].position;
           this.animalCords = { x, y, z };
-          gameEvents.dispatchEvent({
-            type: "fence:clicked",
-          });
+          gameEvents.dispatchEvent({ type: "fence:clicked" });
           return;
         }
 
-        const clickedPlant = plant.getHitBoxes().find((box) => box === hit);
+        const clickedPlantHitBox = plant
+          .getHitBoxes()
+          .find((box) => box === hit);
 
-        if (clickedPlant) {
-          const { x, y, z } = intersects[0].point;
-          this.plantCords = { x, y, z };
+        if (clickedPlantHitBox) {
+          const worldPosition = new Vector3();
+          clickedPlantHitBox.getWorldPosition(worldPosition);
+          this.plantCords = {
+            x: worldPosition.x,
+            y: worldPosition.y,
+            z: worldPosition.z,
+          };
           gameEvents.dispatchEvent({ type: "plantGround:clicked" });
           return;
         }
