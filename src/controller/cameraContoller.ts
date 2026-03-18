@@ -1,3 +1,4 @@
+import gsap from "gsap";
 import type { PerspectiveCamera } from "three";
 import { Vector3 } from "three";
 import type { GameEvents } from "../config";
@@ -13,6 +14,9 @@ export class CameraControls {
 
   private target = new Vector3(0, 0, 0);
   private offset = new Vector3(0, 200, 80);
+
+  private savedTarget = new Vector3();
+  private savedPosition = new Vector3();
 
   init(
     camera: PerspectiveCamera,
@@ -30,6 +34,63 @@ export class CameraControls {
     window.addEventListener("touchstart", (e) => this.onTouchStart(e));
     window.addEventListener("touchmove", (e) => this.onTouchMove(e));
     window.addEventListener("touchend", () => this.onTouchEnd());
+  }
+
+  zoomToPosition(x: number, y: number, z: number) {
+    this.savedTarget.copy(this.target);
+    this.savedPosition.copy(this.camera.position);
+
+    const zoomedOffset = new Vector3(0, 80, 30);
+    const targetPos = { x, y, z };
+    const cameraPos = {
+      x: x + zoomedOffset.x,
+      y: y + zoomedOffset.y,
+      z: z + zoomedOffset.z,
+    };
+
+    gsap.to(this.camera.position, {
+      x: cameraPos.x,
+      y: cameraPos.y,
+      z: cameraPos.z,
+      duration: 0.8,
+      ease: "power2.inOut",
+      onUpdate: () => {
+        this.camera.lookAt(targetPos.x, targetPos.y, targetPos.z);
+      },
+    });
+
+    gsap.to(this.target, {
+      x: targetPos.x,
+      y: targetPos.y,
+      z: targetPos.z,
+      duration: 0.8,
+      ease: "power2.inOut",
+    });
+  }
+
+  resetPosition() {
+    gsap.to(this.camera.position, {
+      x: this.savedPosition.x,
+      y: this.savedPosition.y,
+      z: this.savedPosition.z,
+      duration: 0.8,
+      ease: "power2.inOut",
+      onUpdate: () => {
+        this.camera.lookAt(
+          this.savedTarget.x,
+          this.savedTarget.y,
+          this.savedTarget.z,
+        );
+      },
+    });
+
+    gsap.to(this.target, {
+      x: this.savedTarget.x,
+      y: this.savedTarget.y,
+      z: this.savedTarget.z,
+      duration: 0.8,
+      ease: "power2.inOut",
+    });
   }
 
   private move(deltaX: number, deltaY: number) {

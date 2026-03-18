@@ -50,8 +50,9 @@ export class GameController {
       this.threeScene.cameraController,
     );
 
-    this.gameEvents.addEventListener("placeholder:clicked", () => {
+    this.gameEvents.addEventListener("placeholder:clicked", ({ x, y, z }) => {
       this.audioManager.playSfx("click");
+      this.threeScene.cameraController.zoomToPosition(x, y, z);
       this.pixiUI.showMarket();
     });
 
@@ -60,6 +61,7 @@ export class GameController {
       ({ id, x, y, z }) => {
         if (id === "PLANT") this.threeScene.plant.placePlantAt(x, y, z);
         if (id === "ANIMAL") this.threeScene.animalFence.placeFenceAt(x, y, z);
+        this.threeScene.cameraController.resetPosition();
         this.pixiUI.hideMarket();
       },
     );
