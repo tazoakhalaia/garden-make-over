@@ -1,13 +1,16 @@
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
+import type { GameEvents } from "../config";
 import { plantOrAnimal } from "../enums";
 
 export class PlantMarket {
   private marketBackground!: Graphics;
   private plantContainer = new Container();
   private parentContainer!: Container;
+  private gameEvents!: GameEvents;
 
-  createPlantMarket(container: Container) {
+  createPlantMarket(container: Container, gameEvents: GameEvents) {
     this.parentContainer = container;
+    this.gameEvents = gameEvents;
     this.renderBackground(container);
     this.plantAction(container);
     window.addEventListener("resize", this.onResize);
@@ -144,6 +147,26 @@ export class PlantMarket {
     hitArea.eventMode = "static";
     hitArea.cursor = "pointer";
     this.plantContainer.addChild(hitArea);
+
+    const closeCircle = new Graphics()
+      .roundRect(-60 * scale, -18 * scale, 120 * scale, 36 * scale, 10 * scale)
+      .fill({ color: 0xc62828 });
+
+    const closeText = new Text({
+      text: "✕",
+      style: { fontSize: 15 * scale, fill: "#ffffff", fontWeight: "bold" },
+    });
+    closeText.anchor.set(0.5);
+
+    const closeButton = new Container();
+    closeButton.addChild(closeCircle, closeText);
+    closeButton.eventMode = "static";
+    closeButton.cursor = "pointer";
+    closeButton.on("pointerdown", () => this.destroy());
+    closeButton.x = cardWidth / 2;
+    closeButton.y = cardHeight + 30 * scale;
+
+    this.plantContainer.addChild(closeButton);
 
     this.plantContainer.pivot.set(cardWidth / 2, cardHeight / 2);
     this.plantContainer.position.set(screenWidth / 2, screenHeight / 2);
