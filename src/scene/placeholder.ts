@@ -47,14 +47,11 @@ export class Placeholder {
     }
   }
 
-  removePlaceholder(mesh: Object3D) {
-    const placeholderGroup = this.storePlaceholders.find((g) =>
-      g.children.some(
-        (child) => child === mesh || child.children.includes(mesh as any),
-      ),
+  removePlaceholderAt(x: number, y: number, z: number) {
+    const placeholderGroup = this.storePlaceholders.find(
+      (g) => Math.abs(g.position.x - x) < 5 && Math.abs(g.position.z - z) < 5,
     );
     if (!placeholderGroup) return;
-
     this.scene.remove(placeholderGroup);
     this.storePlaceholders = this.storePlaceholders.filter(
       (g) => g !== placeholderGroup,
@@ -72,6 +69,7 @@ export class Placeholder {
       transparent: true,
       opacity: 0,
     });
+
     const placeholderMesh = new Mesh(placeholder, placeholderColor);
     placeholderMesh.rotation.x = Math.PI / 2;
     placeholderMesh.name = `placeholder_restored`;

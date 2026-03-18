@@ -120,7 +120,6 @@ export class ClickHandler {
         const isPlaceholder = placeholder.getPlaceholders().includes(hit);
         if (isPlaceholder) {
           const { x, y, z } = hit.parent!.position;
-          placeholder.removePlaceholder(hit);
           this.pendingCoords = { x, y, z };
           gameEvents.dispatchEvent({ type: "placeholder:clicked", x, y, z });
           return;

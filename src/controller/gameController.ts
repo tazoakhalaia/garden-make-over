@@ -67,11 +67,11 @@ export class GameController {
       ({ id, x, y, z }) => {
         if (id === "PLANT") this.threeScene.plant.placePlantAt(x, y, z);
         if (id === "ANIMAL") this.threeScene.animalFence.placeFenceAt(x, y, z);
+        this.threeScene.placeholder.removePlaceholderAt(x, y, z);
         this.threeScene.cameraController.resetPosition();
         this.pixiUI.hideMarket();
       },
     );
-
     this.gameEvents.addEventListener("fence:clicked", ({ hitBox }) => {
       this.lastClickedFenceHitBox = hitBox;
       this.lastClickedFencePosition = {
