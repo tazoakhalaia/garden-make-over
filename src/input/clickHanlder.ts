@@ -119,8 +119,7 @@ export class ClickHandler {
           .findIndex((box) => box === hit);
 
         if (clickedFenceIndex !== -1) {
-          const { x, y, z } =
-            animalFence.getHitBoxes()[clickedFenceIndex].position;
+          const { x, y, z } = intersects[0].point;
           this.animalCords = { x, y, z };
           gameEvents.dispatchEvent({ type: "fence:clicked" });
           return;
