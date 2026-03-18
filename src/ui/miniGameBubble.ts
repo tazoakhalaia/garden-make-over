@@ -4,6 +4,7 @@ export class MiniGameBubble {
   private container: Container | null = null;
   private snowContainer: Container | null = null;
   private snowActive = false;
+  private snowCooldown = false;
 
   create(parent: Container, onOpen: () => void, onSnowToggle: () => void) {
     this.container = new Container();
@@ -106,6 +107,13 @@ export class MiniGameBubble {
     });
     this.snowContainer.on("pointerup", () => {
       this.snowContainer!.scale.set(1);
+      if (this.snowCooldown) return;
+
+      this.snowCooldown = true;
+      setTimeout(() => {
+        this.snowCooldown = false;
+      }, 1000);
+
       this.snowActive = !this.snowActive;
 
       snowBg.clear();
