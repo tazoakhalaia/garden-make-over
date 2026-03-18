@@ -114,6 +114,10 @@ export class GameController {
       },
     );
 
+    this.gameEvents.addEventListener("close:plant-market", () => {
+      this.pixiUI.hidePlantMarket();
+    });
+
     this.gameEvents.addEventListener("minigame:coins", ({ coins }) => {
       this.pixiUI.coinUI.add(coins);
     });

@@ -39,6 +39,11 @@ type PlantMarketChooseEvent = {
   z: number;
 };
 
+type ClosePlantMarket = {
+  type: "close:plant-market";
+  id: string;
+};
+
 type UiOpenedEvent = {
   type: "ui:opened";
 };
@@ -77,6 +82,7 @@ export type GameEventMap = {
   "wolf:countdown-start": WolfCountdownStartEvent;
   "wolf:wave-start": WolfWaveStartEvent;
   "wolf:wave-end": WolfWaveEndEvent;
+  "close:plant-market": ClosePlantMarket;
 };
 
 export class GameEvents extends EventDispatcher<GameEventMap> {}

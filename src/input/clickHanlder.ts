@@ -97,6 +97,14 @@ export class ClickHandler {
         return;
       }
 
+      if (id === plantOrAnimal.PLANTMARKETCLOSE) {
+        gameEvents.dispatchEvent({
+          type: "close:plant-market",
+          id,
+        });
+        return;
+      }
+
       this.mouse.set(
         (e.clientX / window.innerWidth) * 2 - 1,
         -(e.clientY / window.innerHeight) * 2 + 1,

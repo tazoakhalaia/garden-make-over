@@ -7,4 +7,5 @@ export enum plantOrAnimal {
   COW = "COW",
   CHICKEN = "CHICKEN",
   SHEEP = "SHEEP",
+  PLANTMARKETCLOSE = "PLANTMARKETCLOSE",
 }

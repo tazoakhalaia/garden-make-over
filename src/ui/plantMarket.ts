@@ -158,16 +158,6 @@ export class PlantMarket {
     });
     closeText.anchor.set(0.5);
 
-    const closeButton = new Container();
-    closeButton.addChild(closeCircle, closeText);
-    closeButton.eventMode = "static";
-    closeButton.cursor = "pointer";
-    closeButton.on("pointerdown", () => this.destroy());
-    closeButton.x = cardWidth / 2;
-    closeButton.y = cardHeight + 30 * scale;
-
-    this.plantContainer.addChild(closeButton);
-
     this.plantContainer.pivot.set(cardWidth / 2, cardHeight / 2);
     this.plantContainer.position.set(screenWidth / 2, screenHeight / 2);
 
@@ -175,6 +165,30 @@ export class PlantMarket {
     hitArea.on("pointerout", () => this.plantContainer.scale.set(1.0));
     hitArea.on("pointerdown", () => this.plantContainer.scale.set(0.95));
     hitArea.on("pointerup", () => this.plantContainer.scale.set(1.05));
+
+    const closeBtn = new Graphics()
+      .roundRect(0, 0, 36 * scale, 36 * scale, 8 * scale)
+      .fill({ color: 0xc62828 });
+    closeBtn.label = plantOrAnimal.PLANTMARKETCLOSE;
+    closeBtn.cursor = "pointer";
+
+    const closeBtnText = new Text({
+      text: "✕",
+      style: new TextStyle({
+        fontFamily: "LuckiestGuy Regular",
+        fontSize: 18 * scale,
+        fill: "#ffffff",
+      }),
+    });
+    closeBtnText.anchor.set(0.5);
+    closeBtnText.x = 18 * scale;
+    closeBtnText.y = 18 * scale;
+
+    const closeBtnContainer = new Container();
+    closeBtnContainer.addChild(closeBtn, closeBtnText);
+    closeBtnContainer.x = cardWidth - 44 * scale;
+    closeBtnContainer.y = -16 * scale;
+    this.plantContainer.addChild(closeBtnContainer);
   }
 
   destroy() {
