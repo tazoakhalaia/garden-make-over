@@ -4,4 +4,4 @@ export * from "./dayNightToggler";
 export * from "./pixiUI";
 export * from "./plantMarket";
 export * from "./plantOrAnimalMarket";
-export * from "./sellProductsBubble";
+export * from "./tutorial";

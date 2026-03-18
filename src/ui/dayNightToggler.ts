@@ -93,7 +93,7 @@ export class DayNightToggler {
     const size = this.btnSize();
     const margin = this.margin();
     this.container.x = window.innerWidth - size - margin;
-    this.container.y = margin + this.btnSize() + Math.round(margin * 0.6);
+    this.container.y = margin + this.btnSize() + Math.round(margin * 0.6) - 60;
     this.drawButton();
   }
 
@@ -232,6 +232,6 @@ export class DayNightToggler {
   }
 
   private margin(): number {
-    return window.innerWidth < 768 ? 12 : 20;
+    return window.innerWidth < 768 ? 30 : 20;
   }
 }
