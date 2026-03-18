@@ -36,6 +36,7 @@ export class GameController {
     );
 
     this.pixiUI.initPixi(this._pixiCanvas, this.gameEvents);
+    this.pixiUI.threeSnowToggle = () => this.threeScene.snow.toggle();
     this.progressBar.init(this.pixiUI.uiLayer, this.gameEvents);
 
     this.clickHandler.setupClickHandler(

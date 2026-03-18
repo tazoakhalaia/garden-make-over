@@ -20,6 +20,7 @@ export class PixiUI {
   public match3!: Match3MiniGame;
   private miniGameBubble = new MiniGameBubble();
   public dayNight = new DayNightToggler();
+  public threeSnowToggle: (() => void) | null = null;
 
   private screenSize = config.baseScreenSize;
 
@@ -55,7 +56,11 @@ export class PixiUI {
         },
       });
 
-      this.miniGameBubble.create(this.uiLayer, () => this.showMatch3());
+      this.miniGameBubble.create(
+        this.uiLayer,
+        () => this.showMatch3(),
+        () => this.threeSnowToggle?.(),
+      );
       this.dayNight.create(this.uiLayer);
 
       this.onResize();
@@ -94,7 +99,7 @@ export class PixiUI {
 
   showPlantMarket() {
     this.gameEvents.dispatchEvent({ type: "ui:opened" });
-    this.plantMarket.createPlantMarket(this.uiLayer);
+    this.plantMarket.createPlantMarket(this.uiLayer, this.gameEvents);
   }
 
   hidePlantMarket() {

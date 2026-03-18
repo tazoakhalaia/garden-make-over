@@ -6,6 +6,7 @@ import { Ground } from "./Ground";
 import { Lights } from "./lights";
 import { Placeholder } from "./placeholder";
 import { Plant } from "./plant";
+import { Snow } from "./snow";
 
 export class ThreeScene {
   private ground = new Ground();
@@ -16,6 +17,7 @@ export class ThreeScene {
   public plant = new Plant();
   public spawner = new Spawner();
   public cameraController = new CameraControls();
+  public snow = new Snow();
 
   public scene!: Scene;
   public perspectiveCamera!: PerspectiveCamera;
@@ -54,6 +56,7 @@ export class ThreeScene {
       this.animalFence.createFence(this.scene, this.loadAllModels);
       this.plant.createPlant(this.scene, this.loadAllModels);
       this.spawner.init(this.scene, this.loadAllModels);
+      this.snow.init(this.scene);
     });
   }
 
