@@ -7,7 +7,7 @@ const MAXIMUM_PROGRESS = 100;
 
 const PROGRESS_INCREMENT_VALUES = {
   placePlot: 5,
-  buyAnimal: 5,
+  buyAnimal: 10,
   buyPlant: 5,
   minigameCoins: 5,
 };
@@ -489,7 +489,7 @@ export class ProgressBar {
       text: "▶  GET IT ON GOOGLE PLAY",
       style: new TextStyle({
         fontFamily: "LuckiestGuy Regular",
-        fontSize: Math.max(11, Math.round(15 * scaleFactor)),
+        fontSize: Math.max(8, Math.round(12 * scaleFactor)),
         fill: "#ffffff",
         letterSpacing: 1,
         dropShadow: {
