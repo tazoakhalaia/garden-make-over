@@ -122,6 +122,10 @@ export class GameController {
       this.pixiUI.coinUI.add(coins);
     });
 
+    this.gameEvents.addEventListener("close:animal-market", () => {
+      this.pixiUI.hideAnimalMarket();
+    });
+
     this.gameEvents.addEventListener("sell-fence", () => {
       if (!this.lastClickedFenceHitBox || !this.lastClickedFencePosition)
         return;

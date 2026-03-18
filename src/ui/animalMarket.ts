@@ -53,6 +53,7 @@ export class AnimalMarket {
     this.updateLayout();
     window.addEventListener("resize", this.onResize);
   }
+
   private onResize = () => this.updateLayout();
 
   private updateLayout() {
@@ -160,24 +161,29 @@ export class AnimalMarket {
 
     this.animalContainer.addChild(content);
 
-    const closeBtn = new Graphics().circle(0, 0, 18).fill({ color: 0xc62828 });
-
+    const closeBg = new Graphics().circle(0, 0, 18).fill({ color: 0xc62828 });
     const closeText = new Text({
       text: "✕",
       style: { fontSize: 15, fill: "#ffffff", fontWeight: "bold" },
     });
     closeText.anchor.set(0.5);
 
-    const btn = new Container();
-    btn.addChild(closeBtn, closeText);
-    btn.eventMode = "static";
-    btn.cursor = "pointer";
-    btn.on("pointerdown", () => this.destroy());
+    const closeBtn = new Container();
+    closeBtn.addChild(closeBg, closeText);
+    closeBtn.label = plantOrAnimal.ANIMALMARKETCLOSE;
+    closeBtn.eventMode = "static";
+    closeBtn.cursor = "pointer";
+    closeBtn.x = content.x + content.width / 2 - 25;
+    closeBtn.y = content.y - 10;
 
-    btn.x = content.x + content.width / 2 - 25;
-    btn.y = content.y - 10;
+    closeBtn.on("pointerup", () => {
+      this.gameEvents.dispatchEvent({
+        type: "close:animal-market",
+        id: plantOrAnimal.ANIMALMARKETCLOSE,
+      });
+    });
 
-    this.animalContainer.addChild(btn);
+    this.animalContainer.addChild(closeBtn);
   }
 
   private createCard(data: AnimalData): Container {
@@ -225,6 +231,7 @@ export class AnimalMarket {
   destroy() {
     window.removeEventListener("resize", this.onResize);
     this.animalContainer.removeFromParent();
-    this.animalContainer.removeChildren();
+    this.animalContainer.destroy({ children: true });
+    this.animalContainer = new Container();
   }
 }

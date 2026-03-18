@@ -68,6 +68,11 @@ type WolfCountdownStartEvent = {
 type WolfWaveStartEvent = { type: "wolf:wave-start" };
 type WolfWaveEndEvent = { type: "wolf:wave-end" };
 
+type CloseAnimalMaket = {
+  type: "close:animal-market";
+  id: string;
+};
+
 export type GameEventMap = {
   "placeholder:clicked": PlaceholderClickedEvent;
   "market:item-selected": MarketItemSelectedEvent;
@@ -83,6 +88,7 @@ export type GameEventMap = {
   "wolf:wave-start": WolfWaveStartEvent;
   "wolf:wave-end": WolfWaveEndEvent;
   "close:plant-market": ClosePlantMarket;
+  "close:animal-market": CloseAnimalMaket;
 };
 
 export class GameEvents extends EventDispatcher<GameEventMap> {}
